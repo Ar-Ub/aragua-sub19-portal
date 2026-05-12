@@ -16,6 +16,204 @@
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+  #loading-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1rem; transition: opacity 0.5s; }
+  #loading-screen.hide { opacity: 0; pointer-events: none; }
+  .loading-badge { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 4px; color: var(--gold); }
+  .loading-bar { width: 200px; height: 2px; background: var(--bg3); border-radius: 1px; overflow: hidden; }
+  .loading-fill { height: 100%; background: var(--gold); animation: loadAnim 1.5s ease infinite; }
+  @keyframes loadAnim { 0%{width:0%} 70%{width:100%} 100%{width:100%} }
+  .loading-text { font-size: 11px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(7,9,14,0.92); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.hide { display: none; }
+  .modal-box { background: var(--bg3); border: 1px solid var(--border-bright); border-radius: 12px; padding: 2.5rem; width: 340px; text-align: center; }
+  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; color: var(--gold); margin-bottom: 0.5rem; }
+  .modal-sub { font-size: 12px; color: var(--muted); letter-spacing: 1px; margin-bottom: 1.5rem; }
+  .pin-input { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 24px; text-align: center; letter-spacing: 8px; padding: 12px; outline: none; transition: border-color 0.2s; }
+  .pin-input:focus { border-color: var(--gold); }
+  .pin-error { font-size: 11px; color: var(--loss); margin-top: 8px; min-height: 16px; }
+  .btn-pin { width: 100%; background: var(--gold); color: var(--bg); border: none; border-radius: 8px; font-family: 'DM Sans'; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 12px; cursor: pointer; margin-top: 1rem; transition: background 0.2s; }
+  .btn-pin:hover { background: #D4A020; }
+  .btn-cancel { background: none; border: none; color: var(--muted); font-size: 11px; cursor: pointer; margin-top: 0.75rem; display: block; width: 100%; letter-spacing: 1px; }
+  .btn-cancel:hover { color: var(--text); }
+  .edit-modal-box { background: var(--bg3); border: 1px solid var(--border-bright); border-radius: 12px; padding: 2rem; width: 520px; max-width: 95vw; text-align: left; }
+  .edit-modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: var(--gold); margin-bottom: 1.5rem; }
+  .confirm-box { background: var(--bg3); border: 1px solid var(--loss); border-radius: 12px; padding: 2rem; width: 340px; text-align: center; }
+  .confirm-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--loss); margin-bottom: 0.5rem; }
+  .confirm-sub { font-size: 13px; color: var(--muted2); margin-bottom: 1.5rem; line-height: 1.5; }
+  .confirm-btns { display: flex; gap: 0.75rem; }
+  .btn-danger { flex: 1; background: var(--loss); color: white; border: none; border-radius: 8px; font-family: 'DM Sans'; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 11px; cursor: pointer; transition: background 0.2s; }
+  .btn-danger:hover { background: #A93226; }
+  .btn-secondary { flex: 1; background: var(--bg2); color: var(--muted2); border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans'; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 11px; cursor: pointer; }
+  .btn-secondary:hover { background: var(--bg4); }
+  header { position: relative; z-index: 10; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, rgba(13,17,24,0.98) 0%, rgba(7,9,14,0.95) 100%); backdrop-filter: blur(10px); }
+  .header-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 72px; }
+  .logo-group { display: flex; align-items: center; gap: 1rem; }
+  .club-badge { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--gold) 0%, #7A5A00 100%); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--bg); letter-spacing: 1px; box-shadow: 0 0 20px rgba(240,180,41,0.3); flex-shrink: 0; }
+  .logo-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: var(--gold); line-height: 1; }
+  .logo-sub { font-size: 10px; letter-spacing: 4px; color: var(--muted2); text-transform: uppercase; }
+  .header-right { display: flex; align-items: center; gap: 1rem; }
+  .season-badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold); background: var(--gold-glow); border: 1px solid var(--border-bright); padding: 4px 12px; border-radius: 4px; letter-spacing: 1px; }
+  .analyst-tag { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+  #sync-indicator { font-size: 10px; letter-spacing: 2px; display: flex; align-items: center; gap: 5px; color: var(--draw); }
+  #sync-indicator.live { color: var(--win); }
+  #sync-indicator.offline { color: var(--loss); }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .nav-tabs { position: sticky; top: 0; z-index: 9; background: rgba(7,9,14,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; }
+  .tab-btn { background: none; border: none; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 16px 24px; cursor: pointer; position: relative; transition: color 0.2s; }
+  .tab-btn::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--gold); transform: scaleX(0); transition: transform 0.2s; }
+  .tab-btn.active { color: var(--gold); }
+  .tab-btn.active::after { transform: scaleX(1); }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.unlocked { color: var(--gold); }
+  main { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeUp 0.4s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2.5rem; }
+  .stat-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1rem; text-align: center; position: relative; overflow: hidden; transition: border-color 0.2s, transform 0.2s; }
+  .stat-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--gold); opacity: 0.6; }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 42px; line-height: 1; color: var(--gold); }
+  .stat-label { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+  .stat-card.win .stat-num { color: var(--win); } .stat-card.win::before { background: var(--win); }
+  .stat-card.draw .stat-num { color: var(--draw); } .stat-card.draw::before { background: var(--draw); }
+  .stat-card.loss .stat-num { color: var(--loss); } .stat-card.loss::before { background: var(--loss); }
+  .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: var(--text); }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+  .section-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+  .matches-table { width: 100%; border-collapse: collapse; }
+  .matches-table th { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; text-align: left; padding: 10px 16px; border-bottom: 1px solid var(--border); font-weight: 500; }
+  .matches-table td { padding: 13px 16px; border-bottom: 1px solid rgba(240,180,41,0.06); font-size: 13.5px; vertical-align: middle; }
+  .matches-table tr:last-child td { border-bottom: none; }
+  .match-row { background: var(--bg3); transition: background 0.15s; }
+  .match-row:hover { background: var(--bg4); }
+  .result-pill { display: inline-block; width: 28px; text-align: center; padding: 3px 0; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; }
+  .result-pill.V { background: rgba(39,174,96,0.2); color: var(--win); }
+  .result-pill.E { background: rgba(243,156,18,0.2); color: var(--draw); }
+  .result-pill.D { background: rgba(192,57,43,0.2); color: var(--loss); }
+  .score-badge { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--text); }
+  .rival-name { font-weight: 500; }
+  .video-link { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--gold); text-decoration: none; background: var(--gold-glow); border: 1px solid var(--border-bright); padding: 5px 12px; border-radius: 4px; transition: background 0.2s; font-weight: 500; }
+  .video-link:hover { background: rgba(240,180,41,0.25); border-color: var(--gold); }
+  .video-link svg { width: 12px; height: 12px; }
+  .no-video { font-size: 11px; color: var(--muted); }
+  .comp-tag { font-size: 10px; padding: 2px 8px; border-radius: 3px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+  .comp-tag.liga { background: rgba(39,174,96,0.15); color: #27AE60; }
+  .comp-tag.copa { background: rgba(52,152,219,0.15); color: #3498DB; }
+  .comp-tag.amistoso { background: rgba(90,106,138,0.2); color: var(--muted2); }
+  .action-btns { display: flex; gap: 6px; }
+  .btn-edit { background: rgba(240,180,41,0.12); border: 1px solid var(--border-bright); color: var(--gold); border-radius: 5px; padding: 5px 10px; font-size: 11px; cursor: pointer; font-family: 'DM Sans'; font-weight: 600; transition: background 0.2s; white-space: nowrap; }
+  .btn-edit:hover { background: rgba(240,180,41,0.25); }
+  .btn-delete { background: rgba(192,57,43,0.12); border: 1px solid rgba(192,57,43,0.3); color: var(--loss); border-radius: 5px; padding: 5px 10px; font-size: 11px; cursor: pointer; font-family: 'DM Sans'; font-weight: 600; transition: background 0.2s; white-space: nowrap; }
+  .btn-delete:hover { background: rgba(192,57,43,0.25); }
+  .admin-section { margin-bottom: 2.5rem; }
+  .admin-section-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 3px; color: var(--muted2); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  .form-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 1.75rem; }
+  .form-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 3px; color: var(--gold); margin-bottom: 1.25rem; }
+  .form-group { margin-bottom: 1rem; }
+  label { display: block; font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  input, select, textarea { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13.5px; padding: 10px 14px; outline: none; transition: border-color 0.2s; }
+  input:focus, select:focus, textarea:focus { border-color: var(--gold); }
+  select option { background: var(--bg2); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .btn-submit { width: 100%; background: var(--gold); color: var(--bg); border: none; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 12px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s, transform 0.1s; }
+  .btn-submit:hover { background: #D4A020; transform: translateY(-1px); }
+  .btn-submit:disabled { background: var(--muted); cursor: not-allowed; transform: none; }
+  .manage-table { width: 100%; border-collapse: collapse; }
+  .manage-table th { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); font-weight: 500; }
+  .manage-table td { padding: 11px 12px; border-bottom: 1px solid rgba(240,180,41,0.06); font-size: 13px; vertical-align: middle; }
+  .manage-table tr:last-child td { border-bottom: none; }
+  .manage-row { background: var(--bg3); transition: background 0.15s; }
+  .manage-row:hover { background: var(--bg4); }
+  .videos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  .video-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color 0.2s, transform 0.2s; }
+  .video-card:hover { border-color: var(--border-bright); transform: translateY(-3px); }
+  .video-thumb { aspect-ratio: 16/9; background: var(--bg2); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .video-thumb::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(240,180,41,0.08) 0%, transparent 60%); }
+  .play-icon { width: 44px; height: 44px; background: rgba(240,180,41,0.15); border: 2px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.2s; }
+  .video-card:hover .play-icon { background: rgba(240,180,41,0.3); transform: scale(1.1); }
+  .play-icon svg { width: 18px; height: 18px; margin-left: 2px; }
+  .video-type-tag { position: absolute; top: 10px; left: 10px; font-size: 9px; letter-spacing: 2px; color: var(--gold); background: rgba(7,9,14,0.85); border: 1px solid var(--border-bright); padding: 3px 8px; border-radius: 3px; text-transform: uppercase; }
+  .video-info { padding: 1rem; }
+  .video-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .video-meta { font-size: 11px; color: var(--muted); }
+  #toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--bg3); border: 1px solid var(--border-bright); color: var(--text); padding: 12px 20px; border-radius: 8px; font-size: 13px; z-index: 999; transform: translateY(80px); opacity: 0; transition: all 0.3s; pointer-events: none; }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.success { border-color: var(--win); color: var(--win); }
+  #toast.error { border-color: var(--loss); color: var(--loss); }
+  .empty-state { text-align: center; padding: 3rem 2rem; color: var(--muted); font-size: 13px; letter-spacing: 1px; }
+  @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(3, 1fr); } .videos-grid { grid-template-columns: 1fr 1fr; } .header-right .analyst-tag { display: none; } .tab-btn { padding: 14px 12px; font-size: 10px; letter-spacing: 1px; } }
+</style>
+</head>
+<body>
+<div id="loading-screen"><div class="loading-badge">ARAGUA FC · SUB-19</div><div class="loading-bar"><div class="loading-fill"></div></div><div class="loading-text">Cargando datos...</div></div>
+<div class="modal-overlay hide" id="pin-modal"><div class="modal-box"><div class="modal-title">🔐 Acceso Analista</div><div class="modal-sub">Ingresa tu PIN para editar</div><input type="password" class="pin-input" id="pin-input" maxlength="4" placeholder="····" inputmode="numeric"><div class="pin-error" id="pin-error"></div><button class="btn-pin" onclick="checkPin()">Entrar</button><button class="btn-cancel" onclick="closePinModal()">Cancelar</button></div></div>
+<div class="modal-overlay hide" id="edit-modal"><div class="edit-modal-box"><div class="edit-modal-title">✏️ Editar Partido</div><input type="hidden" id="edit-id"><div class="form-row"><div class="form-group"><label>Rival</label><input id="e-rival" type="text"></div><div class="form-group"><label>Fecha</label><input id="e-fecha" type="date"></div></div><div class="form-row"><div class="form-group"><label>Goles Aragua</label><input id="e-ga" type="number" min="0"></div><div class="form-group"><label>Goles Rival</label><input id="e-gr" type="number" min="0"></div></div><div class="form-row"><div class="form-group"><label>Competencia</label><select id="e-comp"><option value="liga">Liga</option><option value="copa">Copa</option><option value="amistoso">Amistoso</option></select></div><div class="form-group"><label>Jornada</label><input id="e-jornada" type="text"></div></div><div class="form-group"><label>Link de Video</label><input id="e-video" type="url"></div><div class="form-group"><label>Tipo de Video</label><select id="e-vtipo"><option value="Análisis">Análisis Táctico</option><option value="Highlights">Highlights</option><option value="Set Pieces">Balón Parado</option><option value="Presión">Presión Alta</option></select></div><div class="form-group"><label>Notas</label><textarea id="e-notas" rows="2"></textarea></div><div style="display:flex;gap:0.75rem;margin-top:0.5rem"><button class="btn-submit" style="flex:1" onclick="saveEdit()">Guardar Cambios</button><button class="btn-secondary" style="flex:0.4" onclick="closeEditModal()">Cancelar</button></div></div></div>
+<div class="modal-overlay hide" id="confirm-modal"><div class="confirm-box"><div class="confirm-title">⚠️ Borrar Partido</div><div class="confirm-sub" id="confirm-text"></div><input type="hidden" id="confirm-id"><div class="confirm-btns"><button class="btn-secondary" onclick="closeConfirmModal()">Cancelar</button><button class="btn-danger" onclick="confirmDelete()">Borrar</button></div></div></div>
+<div id="toast"></div>
+<header><div class="header-inner"><div class="logo-group"><div class="club-badge">AFC</div><div><div class="logo-title">Aragua FC · Sub-19</div><div class="logo-sub">Portal de Rendimiento</div></div></div><div class="header-right"><div id="sync-indicator"><div class="sync-dot"></div><span id="sync-text">CONECTANDO</span></div><span class="season-badge">TEMPORADA 2025</span><span class="analyst-tag">Armando Uban · Analista</span></div></div></header>
+<nav class="nav-tabs"><div class="nav-inner"><button class="tab-btn active" onclick="switchTab('overview',this)">Resumen</button><button class="tab-btn" onclick="switchTab('matches',this)">Partidos</button><button class="tab-btn" onclick="switchTab('videos',this)">Videos</button><button class="tab-btn" id="admin-tab-btn" onclick="handleAdminClick(this)">🔐 Analista</button></div></nav>
+<main>
+  <div id="tab-overview" class="tab-panel active"><div class="stats-row" id="stats-row"><div class="stat-card"><div class="stat-num">—</div><div class="stat-label">Partidos</div></div></div></div>
+  <div id="tab-matches" class="tab-panel"><div class="section-header"><span class="section-title">Todos los Partidos</span><div class="section-line"></div><span class="section-count" id="all-count"></span></div><table class="matches-table"><thead><tr><th>#</th><th>Res.</th><th>Rival</th><th>Marcador</th><th>Comp.</th><th>Jornada</th><th>Fecha</th><th>Notas</th><th>Video</th></tr></thead><tbody id="all-tbody"></tbody></table></div>
+  <div id="tab-videos" class="tab-panel"><div class="section-header"><span class="section-title">Análisis en Video</span><div class="section-line"></div><span class="section-count" id="video-count"></span></div><div class="videos-grid" id="videos-grid"></div></div>
+  <div id="tab-admin" class="tab-panel">
+    <div class="admin-section"><div class="admin-section-title">Registrar Nuevo Partido</div><div class="form-card"><div class="form-row"><div class="form-group"><label>Rival</label><input id="f-rival" type="text" placeholder="Nombre del equipo"></div><div class="form-group"><label>Fecha</label><input id="f-fecha" type="date"></div></div><div class="form-row"><div class="form-group"><label>Goles Aragua</label><input id="f-ga" type="number" min="0" placeholder="0"></div><div class="form-group"><label>Goles Rival</label><input id="f-gr" type="number" min="0" placeholder="0"></div></div><div class="form-row"><div class="form-group"><label>Competencia</label><select id="f-comp"><option value="liga">Liga</option><option value="copa">Copa</option><option value="amistoso">Amistoso</option></select></div><div class="form-group"><label>Jornada / Fase</label><input id="f-jornada" type="text" placeholder="J1, Cuartos..."></div></div><div class="form-row"><div class="form-group"><label>Link de Video</label><input id="f-video" type="url" placeholder="https://..."></div><div class="form-group"><label>Tipo de Video</label><select id="f-vtipo"><option value="Análisis">Análisis Táctico</option><option value="Highlights">Highlights</option><option value="Set Pieces">Balón Parado</option><option value="Presión">Presión Alta</option></select></div></div><div class="form-group"><label>Notas del Analista</label><textarea id="f-notas" rows="2" placeholder="Observaciones clave..."></textarea></div><button class="btn-submit" id="btn-add-match" onclick="addMatch()">+ Registrar Partido</button></div></div>
+    <div class="admin-section"><div class="admin-section-title">Gestionar Partidos Registrados</div><table class="manage-table"><thead><tr><th>Fecha</th><th>Rival</th><th>Marcador</th><th>Comp.</th><th>Video</th><th>Acciones</th></tr></thead><tbody id="manage-tbody"></tbody></table></div>
+  </div>
+</main>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getFirestore,collection,doc,addDoc,updateDoc,deleteDoc,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyC3qThe7VZlVeMO_P0jV1PcQ5j4ZG_AUcU",authDomain:"au-ar-aragua-sub-19.firebaseapp.com",projectId:"au-ar-aragua-sub-19",storageBucket:"au-ar-aragua-sub-19.firebasestorage.app",messagingSenderId:"576436448748",appId:"1:576436448748:web:16744c40736382f13b24c9"};
+const app=initializeApp(firebaseConfig),db=getFirestore(app),ADMIN_PIN='2121';
+let isAdmin=false,matches=[];
+function getResult(ga,gr){return+ga>+gr?'V':+ga<+gr?'D':'E';}
+function formatDate(d){if(!d)return'—';const[y,m,day]=d.split('-');return day+'/'+m+'/'+y;}
+function videoBtn(url,tipo){if(!url)return'<span class="no-video">—</span>';return'<a href="'+url+'" target="_blank" class="video-link"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>'+(tipo||'Ver')+'</a>';}
+function compTag(c){const l={liga:'Liga',copa:'Copa',amistoso:'Amistoso'};return'<span class="comp-tag '+c+'">'+(l[c]||c)+'</span>';}
+function showToast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+type;setTimeout(()=>t.className='',3000);}
+function setSyncStatus(s){const el=document.getElementById('sync-indicator'),txt=document.getElementById('sync-text');el.className=s;txt.textContent=s==='live'?'● EN VIVO':s==='offline'?'SIN CONEXIÓN':'CONECTANDO';}
+function renderOverview(){const w=matches.filter(m=>+m.ga>+m.gr).length,dr=matches.filter(m=>+m.ga===+m.gr).length,l=matches.filter(m=>+m.ga<+m.gr).length,gf=matches.reduce((s,m)=>s+(+m.ga),0),gc=matches.reduce((s,m)=>s+(+m.gr),0);document.getElementById('stats-row').innerHTML='<div class="stat-card"><div class="stat-num">'+matches.length+'</div><div class="stat-label">Partidos</div></div><div class="stat-card win"><div class="stat-num">'+w+'</div><div class="stat-label">Victorias</div></div><div class="stat-card draw"><div class="stat-num">'+dr+'</div><div class="stat-label">Empates</div></div><div class="stat-card loss"><div class="stat-num">'+l+'</div><div class="stat-label">Derrotas</div></div><div class="stat-card"><div class="stat-num">'+gf+'<span style="color:var(--muted);font-size:22px">/'+ gc+'</span></div><div class="stat-label">GF / GC</div></div>';}
+function renderMatches(){const s=[...matches].sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));document.getElementById('all-count').textContent=s.length+' partidos';document.getElementById('all-tbody').innerHTML=s.length===0?'<tr><td colspan="9" class="empty-state">Sin partidos registrados aún</td></tr>':s.map((m,i)=>{const r=getResult(m.ga,m.gr);return'<tr class="match-row"><td style="color:var(--muted);font-family:monospace;font-size:11px">'+String(i+1).padStart(2,'0')+'</td><td><span class="result-pill '+r+'">'+r+'</span></td><td><span class="rival-name">'+m.rival+'</span></td><td><span class="score-badge">'+m.ga+' — '+m.gr+'</span></td><td>'+compTag(m.comp)+'</td><td style="color:var(--muted2);font-size:12px">'+(m.jornada||'—')+'</td><td style="color:var(--muted);font-size:12px">'+formatDate(m.fecha)+'</td><td style="color:var(--muted2);font-size:12px;max-width:160px">'+(m.notas||'—')+'</td><td>'+videoBtn(m.video,m.vtipo)+'</td></tr>';}).join('');}
+function renderVideos(){const wv=matches.filter(m=>m.video);document.getElementById('video-count').textContent=wv.length+' videos';document.getElementById('videos-grid').innerHTML=wv.length===0?'<div class="empty-state" style="grid-column:1/-1">No hay videos registrados aún</div>':wv.map(m=>'<a href="'+m.video+'" target="_blank" class="video-card" style="text-decoration:none;color:inherit"><div class="video-thumb"><div class="video-type-tag">'+(m.vtipo||'Video')+'</div><div class="play-icon"><svg viewBox="0 0 24 24" fill="var(--gold)"><path d="M8 5v14l11-7z"/></svg></div></div><div class="video-info"><div class="video-title">vs '+m.rival+'</div><div class="video-meta">'+compTag(m.comp)+' · '+formatDate(m.fecha)+'</div>'+(m.notas?'<div style="font-size:11px;color:var(--muted);margin-top:6px">'+m.notas+'</div>':'')+'</div></a>').join('');}
+function renderManageTable(){const s=[...matches].sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));document.getElementById('manage-tbody').innerHTML=s.length===0?'<tr><td colspan="6" class="empty-state">Sin partidos registrados</td></tr>':s.map(m=>{const r=getResult(m.ga,m.gr);return'<tr class="manage-row"><td style="color:var(--muted);font-size:12px">'+formatDate(m.fecha)+'</td><td><strong>'+m.rival+'</strong></td><td><span class="result-pill '+r+'" style="margin-right:6px">'+r+'</span><span class="score-badge" style="font-size:15px">'+m.ga+'–'+m.gr+'</span></td><td>'+compTag(m.comp)+'</td><td>'+(m.video?'<a href="'+m.video+'" target="_blank" style="color:var(--gold);font-size:11px">▶ Ver</a>':'<span style="color:var(--muted);font-size:11px">—</span>')+'</td><td><div class="action-btns"><button class="btn-edit" onclick="openEdit(''+m.id+'')">✏️ Editar</button><button class="btn-delete" onclick="openDelete(''+m.id+'',''+m.rival.replace(/'/g,'')+'')">🗑️ Borrar</button></div></td></tr>';}).join('');}
+function renderAll(){renderOverview();renderMatches();renderVideos();if(isAdmin)renderManageTable();}
+onSnapshot(collection(db,'partidos'),snap=>{matches=snap.docs.map(d=>({id:d.id,...d.data()}));renderAll();setSyncStatus('live');setTimeout(()=>document.getElementById('loading-screen').classList.add('hide'),800);},err=>{console.error(err);setSyncStatus('offline');document.getElementById('loading-screen').classList.add('hide');showToast('Error conectando con Firebase','error');});
+window.addMatch=async function(){const rival=document.getElementById('f-rival').value.trim(),fecha=document.getElementById('f-fecha').value;if(!rival||!fecha){showToast('Completa rival y fecha','error');return;}const btn=document.getElementById('btn-add-match');btn.disabled=true;btn.textContent='Guardando...';try{await addDoc(collection(db,'partidos'),{rival,fecha,ga:parseInt(document.getElementById('f-ga').value)||0,gr:parseInt(document.getElementById('f-gr').value)||0,comp:document.getElementById('f-comp').value,jornada:document.getElementById('f-jornada').value,video:document.getElementById('f-video').value,vtipo:document.getElementById('f-vtipo').value,notas:document.getElementById('f-notas').value,createdAt:new Date().toISOString()});['f-rival','f-ga','f-gr','f-jornada','f-video','f-notas'].forEach(id=>document.getElementById(id).value='');showToast('✅ Partido guardado en la nube');}catch(e){showToast('Error guardando partido','error');}btn.disabled=false;btn.textContent='+ Registrar Partido';};
+window.openEdit=function(id){const m=matches.find(x=>x.id===id);if(!m)return;document.getElementById('edit-id').value=id;document.getElementById('e-rival').value=m.rival||'';document.getElementById('e-fecha').value=m.fecha||'';document.getElementById('e-ga').value=m.ga??0;document.getElementById('e-gr').value=m.gr??0;document.getElementById('e-comp').value=m.comp||'liga';document.getElementById('e-jornada').value=m.jornada||'';document.getElementById('e-video').value=m.video||'';document.getElementById('e-vtipo').value=m.vtipo||'Análisis';document.getElementById('e-notas').value=m.notas||'';document.getElementById('edit-modal').classList.remove('hide');};
+window.saveEdit=async function(){const id=document.getElementById('edit-id').value,rival=document.getElementById('e-rival').value.trim(),fecha=document.getElementById('e-fecha').value;if(!rival||!fecha){showToast('Completa rival y fecha','error');return;}try{await updateDoc(doc(db,'partidos',id),{rival,fecha,ga:parseInt(document.getElementById('e-ga').value)||0,gr:parseInt(document.getElementById('e-gr').value)||0,comp:document.getElementById('e-comp').value,jornada:document.getElementById('e-jornada').value,video:document.getElementById('e-video').value,vtipo:document.getElementById('e-vtipo').value,notas:document.getElementById('e-notas').value,updatedAt:new Date().toISOString()});closeEditModal();showToast('✅ Partido actualizado');}catch(e){showToast('Error actualizando partido','error');};};
+window.closeEditModal=function(){document.getElementById('edit-modal').classList.add('hide');};
+window.openDelete=function(id,rival){document.getElementById('confirm-id').value=id;document.getElementById('confirm-text').textContent='¿Seguro que quieres borrar el partido vs '+rival+'? Esta acción no se puede deshacer.';document.getElementById('confirm-modal').classList.remove('hide');};
+window.confirmDelete=async function(){const id=document.getElementById('confirm-id').value;try{await deleteDoc(doc(db,'partidos',id));closeConfirmModal();showToast('🗑️ Partido eliminado');}catch(e){showToast('Error eliminando partido','error');};};
+window.closeConfirmModal=function(){document.getElementById('confirm-modal').classList.add('hide');};
+window.handleAdminClick=function(btn){if(isAdmin){switchTab('admin',btn);}else{document.getElementById('pin-modal').classList.remove('hide');document.getElementById('pin-input').focus();}};
+window.checkPin=function(){const val=document.getElementById('pin-input').value;if(val===ADMIN_PIN){isAdmin=true;document.getElementById('pin-modal').classList.add('hide');document.getElementById('pin-input').value='';document.getElementById('pin-error').textContent='';const btn=document.getElementById('admin-tab-btn');btn.classList.add('unlocked');btn.textContent='⚡ Analista';renderManageTable();switchTab('admin',btn);showToast('✅ Acceso de analista activado');}else{document.getElementById('pin-error').textContent='PIN incorrecto';document.getElementById('pin-input').value='';}};
+window.closePinModal=function(){document.getElementById('pin-modal').classList.add('hide');document.getElementById('pin-input').value='';document.getElementById('pin-error').textContent='';};
+window.switchTab=function(name,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');};
+document.getElementById('pin-input').addEventListener('keydown',e=>{if(e.key==='Enter')window.checkPin();});
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aragua FC Sub-19 · Portal de Rendimiento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #F0B429; --gold-dim: #A87A1A; --gold-glow: rgba(240,180,41,0.15);
+    --bg: #07090E; --bg2: #0D1118; --bg3: #131927; --bg4: #1A2235;
+    --border: rgba(240,180,41,0.15); --border-bright: rgba(240,180,41,0.4);
+    --text: #E8ECF4; --muted: #5A6A8A; --muted2: #8892B0;
+    --win: #27AE60; --draw: #F39C12; --loss: #C0392B;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
   #loading-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1rem; transition: opacity 0.4s; }
   #loading-screen.hide { opacity: 0; pointer-events: none; }
   .loading-badge { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 4px; color: var(--gold); }
