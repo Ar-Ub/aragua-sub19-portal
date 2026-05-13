@@ -1,611 +1,1890 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aragua FC Sub-19 · Portal de Rendimiento</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --gold: #F0B429; --gold-dim: #A87A1A; --gold-glow: rgba(240,180,41,0.15);
-    --bg: #07090E; --bg2: #0D1118; --bg3: #131927; --bg4: #1A2235;
-    --border: rgba(240,180,41,0.15); --border-bright: rgba(240,180,41,0.4);
-    --text: #E8ECF4; --muted: #5A6A8A; --muted2: #8892B0;
-    --win: #27AE60; --draw: #F39C12; --loss: #C0392B;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
-  #loading-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1rem; transition: opacity 0.5s; }
-  #loading-screen.hide { opacity: 0; pointer-events: none; }
-  .loading-badge { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 4px; color: var(--gold); }
-  .loading-bar { width: 200px; height: 2px; background: var(--bg3); border-radius: 1px; overflow: hidden; }
-  .loading-fill { height: 100%; background: var(--gold); animation: loadAnim 1.5s ease infinite; }
-  @keyframes loadAnim { 0%{width:0%} 70%{width:100%} 100%{width:100%} }
-  .loading-text { font-size: 11px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
-  .modal-overlay { position: fixed; inset: 0; background: rgba(7,9,14,0.92); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-  .modal-overlay.hide { display: none; }
-  .modal-box { background: var(--bg3); border: 1px solid var(--border-bright); border-radius: 12px; padding: 2.5rem; width: 340px; text-align: center; }
-  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; color: var(--gold); margin-bottom: 0.5rem; }
-  .modal-sub { font-size: 12px; color: var(--muted); letter-spacing: 1px; margin-bottom: 1.5rem; }
-  .pin-input { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 24px; text-align: center; letter-spacing: 8px; padding: 12px; outline: none; transition: border-color 0.2s; }
-  .pin-input:focus { border-color: var(--gold); }
-  .pin-error { font-size: 11px; color: var(--loss); margin-top: 8px; min-height: 16px; }
-  .btn-pin { width: 100%; background: var(--gold); color: var(--bg); border: none; border-radius: 8px; font-family: 'DM Sans'; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 12px; cursor: pointer; margin-top: 1rem; transition: background 0.2s; }
-  .btn-pin:hover { background: #D4A020; }
-  .btn-cancel { background: none; border: none; color: var(--muted); font-size: 11px; cursor: pointer; margin-top: 0.75rem; display: block; width: 100%; letter-spacing: 1px; }
-  .btn-cancel:hover { color: var(--text); }
-  .edit-modal-box { background: var(--bg3); border: 1px solid var(--border-bright); border-radius: 12px; padding: 2rem; width: 520px; max-width: 95vw; text-align: left; }
-  .edit-modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: var(--gold); margin-bottom: 1.5rem; }
-  .confirm-box { background: var(--bg3); border: 1px solid var(--loss); border-radius: 12px; padding: 2rem; width: 340px; text-align: center; }
-  .confirm-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--loss); margin-bottom: 0.5rem; }
-  .confirm-sub { font-size: 13px; color: var(--muted2); margin-bottom: 1.5rem; line-height: 1.5; }
-  .confirm-btns { display: flex; gap: 0.75rem; }
-  .btn-danger { flex: 1; background: var(--loss); color: white; border: none; border-radius: 8px; font-family: 'DM Sans'; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 11px; cursor: pointer; transition: background 0.2s; }
-  .btn-danger:hover { background: #A93226; }
-  .btn-secondary { flex: 1; background: var(--bg2); color: var(--muted2); border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans'; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 11px; cursor: pointer; }
-  .btn-secondary:hover { background: var(--bg4); }
-  header { position: relative; z-index: 10; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, rgba(13,17,24,0.98) 0%, rgba(7,9,14,0.95) 100%); backdrop-filter: blur(10px); }
-  .header-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 72px; }
-  .logo-group { display: flex; align-items: center; gap: 1rem; }
-  .club-badge { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--gold) 0%, #7A5A00 100%); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--bg); letter-spacing: 1px; box-shadow: 0 0 20px rgba(240,180,41,0.3); flex-shrink: 0; }
-  .logo-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: var(--gold); line-height: 1; }
-  .logo-sub { font-size: 10px; letter-spacing: 4px; color: var(--muted2); text-transform: uppercase; }
-  .header-right { display: flex; align-items: center; gap: 1rem; }
-  .season-badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold); background: var(--gold-glow); border: 1px solid var(--border-bright); padding: 4px 12px; border-radius: 4px; letter-spacing: 1px; }
-  .analyst-tag { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
-  #sync-indicator { font-size: 10px; letter-spacing: 2px; display: flex; align-items: center; gap: 5px; color: var(--draw); }
-  #sync-indicator.live { color: var(--win); }
-  #sync-indicator.offline { color: var(--loss); }
-  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-  .nav-tabs { position: sticky; top: 0; z-index: 9; background: rgba(7,9,14,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
-  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; }
-  .tab-btn { background: none; border: none; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 16px 24px; cursor: pointer; position: relative; transition: color 0.2s; }
-  .tab-btn::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--gold); transform: scaleX(0); transition: transform 0.2s; }
-  .tab-btn.active { color: var(--gold); }
-  .tab-btn.active::after { transform: scaleX(1); }
-  .tab-btn:hover { color: var(--text); }
-  .tab-btn.unlocked { color: var(--gold); }
-  main { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem; }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; animation: fadeUp 0.4s ease both; }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-  .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2.5rem; }
-  .stat-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1rem; text-align: center; position: relative; overflow: hidden; transition: border-color 0.2s, transform 0.2s; }
-  .stat-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
-  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--gold); opacity: 0.6; }
-  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 42px; line-height: 1; color: var(--gold); }
-  .stat-label { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
-  .stat-card.win .stat-num { color: var(--win); } .stat-card.win::before { background: var(--win); }
-  .stat-card.draw .stat-num { color: var(--draw); } .stat-card.draw::before { background: var(--draw); }
-  .stat-card.loss .stat-num { color: var(--loss); } .stat-card.loss::before { background: var(--loss); }
-  .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
-  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: var(--text); }
-  .section-line { flex: 1; height: 1px; background: var(--border); }
-  .section-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
-  .matches-table { width: 100%; border-collapse: collapse; }
-  .matches-table th { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; text-align: left; padding: 10px 16px; border-bottom: 1px solid var(--border); font-weight: 500; }
-  .matches-table td { padding: 13px 16px; border-bottom: 1px solid rgba(240,180,41,0.06); font-size: 13.5px; vertical-align: middle; }
-  .matches-table tr:last-child td { border-bottom: none; }
-  .match-row { background: var(--bg3); transition: background 0.15s; }
-  .match-row:hover { background: var(--bg4); }
-  .result-pill { display: inline-block; width: 28px; text-align: center; padding: 3px 0; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; }
-  .result-pill.V { background: rgba(39,174,96,0.2); color: var(--win); }
-  .result-pill.E { background: rgba(243,156,18,0.2); color: var(--draw); }
-  .result-pill.D { background: rgba(192,57,43,0.2); color: var(--loss); }
-  .score-badge { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--text); }
-  .rival-name { font-weight: 500; }
-  .video-link { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--gold); text-decoration: none; background: var(--gold-glow); border: 1px solid var(--border-bright); padding: 5px 12px; border-radius: 4px; transition: background 0.2s; font-weight: 500; }
-  .video-link:hover { background: rgba(240,180,41,0.25); border-color: var(--gold); }
-  .video-link svg { width: 12px; height: 12px; }
-  .no-video { font-size: 11px; color: var(--muted); }
-  .comp-tag { font-size: 10px; padding: 2px 8px; border-radius: 3px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
-  .comp-tag.liga { background: rgba(39,174,96,0.15); color: #27AE60; }
-  .comp-tag.copa { background: rgba(52,152,219,0.15); color: #3498DB; }
-  .comp-tag.amistoso { background: rgba(90,106,138,0.2); color: var(--muted2); }
-  .action-btns { display: flex; gap: 6px; }
-  .btn-edit { background: rgba(240,180,41,0.12); border: 1px solid var(--border-bright); color: var(--gold); border-radius: 5px; padding: 5px 10px; font-size: 11px; cursor: pointer; font-family: 'DM Sans'; font-weight: 600; transition: background 0.2s; white-space: nowrap; }
-  .btn-edit:hover { background: rgba(240,180,41,0.25); }
-  .btn-delete { background: rgba(192,57,43,0.12); border: 1px solid rgba(192,57,43,0.3); color: var(--loss); border-radius: 5px; padding: 5px 10px; font-size: 11px; cursor: pointer; font-family: 'DM Sans'; font-weight: 600; transition: background 0.2s; white-space: nowrap; }
-  .btn-delete:hover { background: rgba(192,57,43,0.25); }
-  .admin-section { margin-bottom: 2.5rem; }
-  .admin-section-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 3px; color: var(--muted2); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
-  .form-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 1.75rem; }
-  .form-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 3px; color: var(--gold); margin-bottom: 1.25rem; }
-  .form-group { margin-bottom: 1rem; }
-  label { display: block; font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
-  input, select, textarea { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13.5px; padding: 10px 14px; outline: none; transition: border-color 0.2s; }
-  input:focus, select:focus, textarea:focus { border-color: var(--gold); }
-  select option { background: var(--bg2); }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .btn-submit { width: 100%; background: var(--gold); color: var(--bg); border: none; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 12px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s, transform 0.1s; }
-  .btn-submit:hover { background: #D4A020; transform: translateY(-1px); }
-  .btn-submit:disabled { background: var(--muted); cursor: not-allowed; transform: none; }
-  .manage-table { width: 100%; border-collapse: collapse; }
-  .manage-table th { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); font-weight: 500; }
-  .manage-table td { padding: 11px 12px; border-bottom: 1px solid rgba(240,180,41,0.06); font-size: 13px; vertical-align: middle; }
-  .manage-table tr:last-child td { border-bottom: none; }
-  .manage-row { background: var(--bg3); transition: background 0.15s; }
-  .manage-row:hover { background: var(--bg4); }
-  .videos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-  .video-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color 0.2s, transform 0.2s; }
-  .video-card:hover { border-color: var(--border-bright); transform: translateY(-3px); }
-  .video-thumb { aspect-ratio: 16/9; background: var(--bg2); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-  .video-thumb::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(240,180,41,0.08) 0%, transparent 60%); }
-  .play-icon { width: 44px; height: 44px; background: rgba(240,180,41,0.15); border: 2px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.2s; }
-  .video-card:hover .play-icon { background: rgba(240,180,41,0.3); transform: scale(1.1); }
-  .play-icon svg { width: 18px; height: 18px; margin-left: 2px; }
-  .video-type-tag { position: absolute; top: 10px; left: 10px; font-size: 9px; letter-spacing: 2px; color: var(--gold); background: rgba(7,9,14,0.85); border: 1px solid var(--border-bright); padding: 3px 8px; border-radius: 3px; text-transform: uppercase; }
-  .video-info { padding: 1rem; }
-  .video-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
-  .video-meta { font-size: 11px; color: var(--muted); }
-  #toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--bg3); border: 1px solid var(--border-bright); color: var(--text); padding: 12px 20px; border-radius: 8px; font-size: 13px; z-index: 999; transform: translateY(80px); opacity: 0; transition: all 0.3s; pointer-events: none; }
-  #toast.show { transform: translateY(0); opacity: 1; }
-  #toast.success { border-color: var(--win); color: var(--win); }
-  #toast.error { border-color: var(--loss); color: var(--loss); }
-  .empty-state { text-align: center; padding: 3rem 2rem; color: var(--muted); font-size: 13px; letter-spacing: 1px; }
-  @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(3, 1fr); } .videos-grid { grid-template-columns: 1fr 1fr; } .header-right .analyst-tag { display: none; } .tab-btn { padding: 14px 12px; font-size: 10px; letter-spacing: 1px; } }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aragua FC Sub-19 · Portal de Rendimiento</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+    :root {
+        --gold: #F0B429;
+        --gold-dim: #A87A1A;
+        --gold-glow: rgba(240, 180, 41, 0.15);
+        --bg: #07090E;
+        --bg2: #0D1118;
+        --bg3: #131927;
+        --bg4: #1A2235;
+        --border: rgba(240, 180, 41, 0.15);
+        --border-bright: rgba(240, 180, 41, 0.4);
+        --text: #E8ECF4;
+        --muted: #5A6A8A;
+        --muted2: #8892B0;
+        --win: #27AE60;
+        --draw: #F39C12;
+        --loss: #C0392B;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'DM Sans', sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }/* LOADING */
+
+    #loading-screen {
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 1rem;
+        transition: opacity 0.5s;
+    }
+
+    #loading-screen.hide {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .loading-badge {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        letter-spacing: 4px;
+        color: var(--gold);
+    }
+
+    .loading-bar {
+        width: 200px;
+        height: 2px;
+        background: var(--bg3);
+        border-radius: 1px;
+        overflow: hidden;
+    }
+
+    .loading-fill {
+        height: 100%;
+        background: var(--gold);
+        animation: loadAnim 1.5s ease infinite;
+    }
+
+    @keyframes loadAnim {
+        0% {
+            width:0%
+        }
+
+        70% {
+            width:100%
+        }
+
+        100% {
+            width: 100%
+        }
+    }
+
+    .loading-text {
+        font-size: 11px;
+        letter-spacing: 3px;
+        color: var(--muted);
+        text-transform: uppercase;
+    }/* MODALS */
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(7, 9, 14, 0.92);
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.hide {
+        display: none;
+    }
+
+    .modal-box {
+        background: var(--bg3);
+        border: 1px solid var(--border-bright);
+        border-radius: 12px;
+        padding: 2.5rem;
+        width: 340px;
+        text-align: center;
+    }
+
+    .modal-wide {
+        background: var(--bg3);
+        border: 1px solid var(--border-bright);
+        border-radius: 12px;
+        padding: 2rem;
+        width: 520px;
+        max-width: 95vw;
+        text-align: left;
+    }
+
+    .modal-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 20px;
+        letter-spacing: 3px;
+        color: var(--gold);
+        margin-bottom: 0.5rem;
+    }
+
+    .modal-sub {
+        font-size: 12px;
+        color: var(--muted);
+        letter-spacing: 1px;
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-section-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 16px;
+        letter-spacing: 3px;
+        color: var(--gold);
+        margin-bottom: 1.25rem;
+    }
+
+    .pin-input {
+        width: 100%;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 24px;
+        text-align: center;
+        letter-spacing: 8px;
+        padding: 12px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .pin-input:focus {
+        border-color: var(--gold);
+    }
+
+    .pin-error {
+        font-size: 11px;
+        color: var(--loss);
+        margin-top: 8px;
+        min-height: 16px;
+    }
+
+    .btn-pin {
+        width: 100%;
+        background: var(--gold);
+        color: var(--bg);
+        border: none;
+        border-radius: 8px;
+        font-family: 'DM Sans';
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 12px;
+        cursor: pointer;
+        margin-top: 1rem;
+        transition: background 0.2s;
+    }
+
+    .btn-pin:hover {
+        background: #D4A020;
+    }
+
+    .btn-cancel-modal {
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-size: 11px;
+        cursor: pointer;
+        margin-top: 0.75rem;
+        display: block;
+        width: 100%;
+        letter-spacing: 1px;
+    }
+
+    .btn-cancel-modal:hover {
+        color: var(--text);
+    }
+
+    .confirm-box {
+        background: var(--bg3);
+        border: 1px solid var(--loss);
+        border-radius: 12px;
+        padding: 2rem;
+        width: 340px;
+        text-align: center;
+    }
+
+    .confirm-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 18px;
+        letter-spacing: 2px;
+        color: var(--loss);
+        margin-bottom: 0.5rem;
+    }
+
+    .confirm-sub {
+        font-size: 13px;
+        color: var(--muted2);
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .confirm-btns {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .btn-danger {
+        flex: 1;
+        background: var(--loss);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-family: 'DM Sans';
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 11px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-danger:hover {
+        background: #A93226;
+    }
+
+    .btn-secondary {
+        flex: 1;
+        background: var(--bg2);
+        color: var(--muted2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-family: 'DM Sans';
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 11px;
+        cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+        background: var(--bg4);
+    }/* HEADER */
+
+    header {
+        position: relative;
+        z-index: 10;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(180deg, rgba(13, 17, 24, 0.98) 0%, rgba(7, 9, 14, 0.95) 100%);
+        backdrop-filter: blur(10px);
+    }
+
+    .header-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 72px;
+    }
+
+    .logo-group {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .club-badge {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold) 0%, #7A5A00 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 16px;
+        color: var(--bg);
+        letter-spacing: 1px;
+        box-shadow: 0 0 20px rgba(240, 180, 41, 0.3);
+        flex-shrink: 0;
+    }
+
+    .logo-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 22px;
+        letter-spacing: 3px;
+        color: var(--gold);
+        line-height: 1;
+    }
+
+    .logo-sub {
+        font-size: 10px;
+        letter-spacing: 4px;
+        color: var(--muted2);
+        text-transform: uppercase;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .season-badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--gold);
+        background: var(--gold-glow);
+        border: 1px solid var(--border-bright);
+        padding: 4px 12px;
+        border-radius: 4px;
+        letter-spacing: 1px;
+    }
+
+    .analyst-tag {
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 1px;
+    }
+
+    #sync-indicator {
+        font-size: 10px;
+        letter-spacing: 2px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: var(--draw);
+    }
+
+    #sync-indicator.live {
+        color: var(--win);
+    }
+
+    #sync-indicator.offline {
+        color: var(--loss);
+    }
+
+    .sync-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }/* NAV */
+
+    .nav-tabs {
+        position: sticky;
+        top: 0;
+        z-index: 9;
+        background: rgba(7, 9, 14, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+    }
+
+    .tab-btn {
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 16px 24px;
+        cursor: pointer;
+        position: relative;
+        transition: color 0.2s;
+    }
+
+    .tab-btn::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--gold);
+        transform: scaleX(0);
+        transition: transform 0.2s;
+    }
+
+    .tab-btn.active {
+        color: var(--gold);
+    }
+
+    .tab-btn.active::after {
+        transform: scaleX(1);
+    }
+
+    .tab-btn:hover {
+        color: var(--text);
+    }
+
+    .tab-btn.unlocked {
+        color: var(--gold);
+    }/* MAIN */
+
+    main {
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2.5rem 2rem;
+    }
+
+    .tab-panel {
+        display: none;
+    }
+
+    .tab-panel.active {
+        display: block;
+        animation: fadeUp 0.4s ease both;
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform:translateY(12px)
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0)
+        }
+    }/* STATS */
+
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.25rem 1rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .stat-card:hover {
+        border-color: var(--border-bright);
+        transform: translateY(-2px);
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--gold);
+        opacity: 0.6;
+    }
+
+    .stat-num {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 42px;
+        line-height: 1;
+        color: var(--gold);
+    }
+
+    .stat-label {
+        font-size: 10px;
+        letter-spacing: 2px;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin-top: 4px;
+    }
+
+    .stat-card.win .stat-num {
+        color: var(--win);
+    }
+
+    .stat-card.win::before {
+        background: var(--win);
+    }
+
+    .stat-card.draw .stat-num {
+        color: var(--draw);
+    }
+
+    .stat-card.draw::before {
+        background: var(--draw);
+    }
+
+    .stat-card.loss .stat-num {
+        color: var(--loss);
+    }
+
+    .stat-card.loss::before {
+        background: var(--loss);
+    }/* SECTION */
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .section-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 18px;
+        letter-spacing: 3px;
+        color: var(--text);
+    }
+
+    .section-line {
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+    }
+
+    .section-count {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--muted);
+    }/* TABLE */
+
+    .matches-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .matches-table th {
+        font-size: 10px;
+        letter-spacing: 2px;
+        color: var(--muted);
+        text-transform: uppercase;
+        text-align: left;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        font-weight: 500;
+    }
+
+    .matches-table td {
+        padding: 13px 16px;
+        border-bottom: 1px solid rgba(240, 180, 41, 0.06);
+        font-size: 13.5px;
+        vertical-align: middle;
+    }
+
+    .matches-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .match-row {
+        background: var(--bg3);
+        transition: background 0.15s;
+    }
+
+    .match-row:hover {
+        background: var(--bg4);
+    }
+
+    .result-pill {
+        display: inline-block;
+        width: 28px;
+        text-align: center;
+        padding: 3px 0;
+        border-radius: 4px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+    .result-pill.V {
+        background: rgba(39, 174, 96, 0.2);
+        color: var(--win);
+    }
+
+    .result-pill.E {
+        background: rgba(243, 156, 18, 0.2);
+        color: var(--draw);
+    }
+
+    .result-pill.D {
+        background: rgba(192, 57, 43, 0.2);
+        color: var(--loss);
+    }
+
+    .score-badge {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 18px;
+        letter-spacing: 2px;
+        color: var(--text);
+    }
+
+    .rival-name {
+        font-weight: 500;
+    }
+
+    .video-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        color: var(--gold);
+        text-decoration: none;
+        background: var(--gold-glow);
+        border: 1px solid var(--border-bright);
+        padding: 5px 12px;
+        border-radius: 4px;
+        transition: background 0.2s;
+        font-weight: 500;
+    }
+
+    .video-link:hover {
+        background: rgba(240, 180, 41, 0.25);
+        border-color: var(--gold);
+    }
+
+    .video-link svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    .no-video {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .comp-tag {
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 3px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .comp-tag.liga {
+        background: rgba(39, 174, 96, 0.15);
+        color: #27AE60;
+    }
+
+    .comp-tag.copa {
+        background: rgba(52, 152, 219, 0.15);
+        color: #3498DB;
+    }
+
+    .comp-tag.amistoso {
+        background: rgba(90, 106, 138, 0.2);
+        color: var(--muted2);
+    }/* VIDEOS GALLERY */
+
+    .videos-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+    }
+
+    .video-card {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: border-color 0.2s, transform 0.2s;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .video-card:hover {
+        border-color: var(--border-bright);
+        transform: translateY(-3px);
+    }
+
+    .video-thumb {
+        aspect-ratio: 16/9;
+        background: var(--bg2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .video-thumb::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(240, 180, 41, 0.08) 0%, transparent 60%);
+    }
+
+    .play-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(240, 180, 41, 0.15);
+        border: 2px solid var(--gold);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, transform 0.2s;
+    }
+
+    .video-card:hover .play-icon {
+        background: rgba(240, 180, 41, 0.3);
+        transform: scale(1.1);
+    }
+
+    .play-icon svg {
+        width: 18px;
+        height: 18px;
+        margin-left: 2px;
+    }
+
+    .video-cat-tag {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 9px;
+        letter-spacing: 2px;
+        color: var(--gold);
+        background: rgba(7, 9, 14, 0.85);
+        border: 1px solid var(--border-bright);
+        padding: 3px 8px;
+        border-radius: 3px;
+        text-transform: uppercase;
+    }
+
+    .video-info {
+        padding: 1rem;
+    }
+
+    .video-title {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: var(--text);
+    }
+
+    .video-desc {
+        font-size: 11px;
+        color: var(--muted);
+        line-height: 1.4;
+        margin-top: 4px;
+    }
+
+    .video-meta {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 6px;
+    }/* VIDEO CATEGORY TABS */
+
+    .cat-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .cat-tab {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-family: 'DM Sans';
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 6px 14px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .cat-tab:hover {
+        border-color: var(--border-bright);
+        color: var(--text);
+    }
+
+    .cat-tab.active {
+        background: var(--gold-glow);
+        border-color: var(--border-bright);
+        color: var(--gold);
+    }/* ADMIN */
+
+    .admin-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .admin-section-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 15px;
+        letter-spacing: 3px;
+        color: var(--muted2);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .form-card {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.75rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    label {
+        display: block;
+        font-size: 10px;
+        letter-spacing: 2px;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13.5px;
+        padding: 10px 14px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        border-color: var(--gold);
+    }
+
+    select option {
+        background: var(--bg2);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .btn-submit {
+        width: 100%;
+        background: var(--gold);
+        color: var(--bg);
+        border: none;
+        border-radius: 6px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 12px;
+        cursor: pointer;
+        margin-top: 0.5rem;
+        transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-submit:hover {
+        background: #D4A020;
+        transform: translateY(-1px);
+    }
+
+    .btn-submit:disabled {
+        background: var(--muted);
+        cursor: not-allowed;
+        transform: none;
+    }/* MANAGE TABLES */
+
+    .manage-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .manage-table th {
+        font-size: 10px;
+        letter-spacing: 2px;
+        color: var(--muted);
+        text-transform: uppercase;
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border);
+        font-weight: 500;
+    }
+
+    .manage-table td {
+        padding: 11px 12px;
+        border-bottom: 1px solid rgba(240, 180, 41, 0.06);
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .manage-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .manage-row {
+        background: var(--bg3);
+        transition: background 0.15s;
+    }
+
+    .manage-row:hover {
+        background: var(--bg4);
+    }
+
+    .action-btns {
+        display: flex;
+        gap: 6px;
+    }
+
+    .btn-edit {
+        background: rgba(240, 180, 41, 0.12);
+        border: 1px solid var(--border-bright);
+        color: var(--gold);
+        border-radius: 5px;
+        padding: 5px 10px;
+        font-size: 11px;
+        cursor: pointer;
+        font-family: 'DM Sans';
+        font-weight: 600;
+        transition: background 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-edit:hover {
+        background: rgba(240, 180, 41, 0.25);
+    }
+
+    .btn-delete {
+        background: rgba(192, 57, 43, 0.12);
+        border: 1px solid rgba(192, 57, 43, 0.3);
+        color: var(--loss);
+        border-radius: 5px;
+        padding: 5px 10px;
+        font-size: 11px;
+        cursor: pointer;
+        font-family: 'DM Sans';
+        font-weight: 600;
+        transition: background 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-delete:hover {
+        background: rgba(192, 57, 43, 0.25);
+    }/* TOAST */
+
+    #toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: var(--bg3);
+        border: 1px solid var(--border-bright);
+        color: var(--text);
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        z-index: 999;
+        transform: translateY(80px);
+        opacity: 0;
+        transition: all 0.3s;
+        pointer-events: none;
+    }
+
+    #toast.show {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    #toast.success {
+        border-color: var(--win);
+        color: var(--win);
+    }
+
+    #toast.error {
+        border-color: var(--loss);
+        color: var(--loss);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--muted);
+        font-size: 13px;
+        letter-spacing: 1px;
+    }
+
+    @media (max-width: 768px) {
+        .stats-row {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .videos-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .header-right .analyst-tag {
+            display: none;
+        }
+
+        .tab-btn {
+            padding: 14px 12px;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+    }
+    </style>
 </head>
 <body>
-<div id="loading-screen"><div class="loading-badge">ARAGUA FC · SUB-19</div><div class="loading-bar"><div class="loading-fill"></div></div><div class="loading-text">Cargando datos...</div></div>
-<div class="modal-overlay hide" id="pin-modal"><div class="modal-box"><div class="modal-title">🔐 Acceso Analista</div><div class="modal-sub">Ingresa tu PIN para editar</div><input type="password" class="pin-input" id="pin-input" maxlength="4" placeholder="····" inputmode="numeric"><div class="pin-error" id="pin-error"></div><button class="btn-pin" onclick="checkPin()">Entrar</button><button class="btn-cancel" onclick="closePinModal()">Cancelar</button></div></div>
-<div class="modal-overlay hide" id="edit-modal"><div class="edit-modal-box"><div class="edit-modal-title">✏️ Editar Partido</div><input type="hidden" id="edit-id"><div class="form-row"><div class="form-group"><label>Rival</label><input id="e-rival" type="text"></div><div class="form-group"><label>Fecha</label><input id="e-fecha" type="date"></div></div><div class="form-row"><div class="form-group"><label>Goles Aragua</label><input id="e-ga" type="number" min="0"></div><div class="form-group"><label>Goles Rival</label><input id="e-gr" type="number" min="0"></div></div><div class="form-row"><div class="form-group"><label>Competencia</label><select id="e-comp"><option value="liga">Liga</option><option value="copa">Copa</option><option value="amistoso">Amistoso</option></select></div><div class="form-group"><label>Jornada</label><input id="e-jornada" type="text"></div></div><div class="form-group"><label>Link de Video</label><input id="e-video" type="url"></div><div class="form-group"><label>Tipo de Video</label><select id="e-vtipo"><option value="Análisis">Análisis Táctico</option><option value="Highlights">Highlights</option><option value="Set Pieces">Balón Parado</option><option value="Presión">Presión Alta</option></select></div><div class="form-group"><label>Notas</label><textarea id="e-notas" rows="2"></textarea></div><div style="display:flex;gap:0.75rem;margin-top:0.5rem"><button class="btn-submit" style="flex:1" onclick="saveEdit()">Guardar Cambios</button><button class="btn-secondary" style="flex:0.4" onclick="closeEditModal()">Cancelar</button></div></div></div>
-<div class="modal-overlay hide" id="confirm-modal"><div class="confirm-box"><div class="confirm-title">⚠️ Borrar Partido</div><div class="confirm-sub" id="confirm-text"></div><input type="hidden" id="confirm-id"><div class="confirm-btns"><button class="btn-secondary" onclick="closeConfirmModal()">Cancelar</button><button class="btn-danger" onclick="confirmDelete()">Borrar</button></div></div></div>
-<div id="toast"></div>
-<header><div class="header-inner"><div class="logo-group"><div class="club-badge">AFC</div><div><div class="logo-title">Aragua FC · Sub-19</div><div class="logo-sub">Portal de Rendimiento</div></div></div><div class="header-right"><div id="sync-indicator"><div class="sync-dot"></div><span id="sync-text">CONECTANDO</span></div><span class="season-badge">TEMPORADA 2025</span><span class="analyst-tag">Armando Uban · Analista</span></div></div></header>
-<nav class="nav-tabs"><div class="nav-inner"><button class="tab-btn active" onclick="switchTab('overview',this)">Resumen</button><button class="tab-btn" onclick="switchTab('matches',this)">Partidos</button><button class="tab-btn" onclick="switchTab('videos',this)">Videos</button><button class="tab-btn" id="admin-tab-btn" onclick="handleAdminClick(this)">🔐 Analista</button></div></nav>
-<main>
-  <div id="tab-overview" class="tab-panel active"><div class="stats-row" id="stats-row"><div class="stat-card"><div class="stat-num">—</div><div class="stat-label">Partidos</div></div></div></div>
-  <div id="tab-matches" class="tab-panel"><div class="section-header"><span class="section-title">Todos los Partidos</span><div class="section-line"></div><span class="section-count" id="all-count"></span></div><table class="matches-table"><thead><tr><th>#</th><th>Res.</th><th>Rival</th><th>Marcador</th><th>Comp.</th><th>Jornada</th><th>Fecha</th><th>Notas</th><th>Video</th></tr></thead><tbody id="all-tbody"></tbody></table></div>
-  <div id="tab-videos" class="tab-panel"><div class="section-header"><span class="section-title">Análisis en Video</span><div class="section-line"></div><span class="section-count" id="video-count"></span></div><div class="videos-grid" id="videos-grid"></div></div>
-  <div id="tab-admin" class="tab-panel">
-    <div class="admin-section"><div class="admin-section-title">Registrar Nuevo Partido</div><div class="form-card"><div class="form-row"><div class="form-group"><label>Rival</label><input id="f-rival" type="text" placeholder="Nombre del equipo"></div><div class="form-group"><label>Fecha</label><input id="f-fecha" type="date"></div></div><div class="form-row"><div class="form-group"><label>Goles Aragua</label><input id="f-ga" type="number" min="0" placeholder="0"></div><div class="form-group"><label>Goles Rival</label><input id="f-gr" type="number" min="0" placeholder="0"></div></div><div class="form-row"><div class="form-group"><label>Competencia</label><select id="f-comp"><option value="liga">Liga</option><option value="copa">Copa</option><option value="amistoso">Amistoso</option></select></div><div class="form-group"><label>Jornada / Fase</label><input id="f-jornada" type="text" placeholder="J1, Cuartos..."></div></div><div class="form-row"><div class="form-group"><label>Link de Video</label><input id="f-video" type="url" placeholder="https://..."></div><div class="form-group"><label>Tipo de Video</label><select id="f-vtipo"><option value="Análisis">Análisis Táctico</option><option value="Highlights">Highlights</option><option value="Set Pieces">Balón Parado</option><option value="Presión">Presión Alta</option></select></div></div><div class="form-group"><label>Notas del Analista</label><textarea id="f-notas" rows="2" placeholder="Observaciones clave..."></textarea></div><button class="btn-submit" id="btn-add-match" onclick="addMatch()">+ Registrar Partido</button></div></div>
-    <div class="admin-section"><div class="admin-section-title">Gestionar Partidos Registrados</div><table class="manage-table"><thead><tr><th>Fecha</th><th>Rival</th><th>Marcador</th><th>Comp.</th><th>Video</th><th>Acciones</th></tr></thead><tbody id="manage-tbody"></tbody></table></div>
-  </div>
-</main>
-<script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,doc,addDoc,updateDoc,deleteDoc,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-const firebaseConfig={apiKey:"AIzaSyC3qThe7VZlVeMO_P0jV1PcQ5j4ZG_AUcU",authDomain:"au-ar-aragua-sub-19.firebaseapp.com",projectId:"au-ar-aragua-sub-19",storageBucket:"au-ar-aragua-sub-19.firebasestorage.app",messagingSenderId:"576436448748",appId:"1:576436448748:web:16744c40736382f13b24c9"};
-const app=initializeApp(firebaseConfig),db=getFirestore(app),ADMIN_PIN='2121';
-let isAdmin=false,matches=[];
-function getResult(ga,gr){return+ga>+gr?'V':+ga<+gr?'D':'E';}
-function formatDate(d){if(!d)return'—';const[y,m,day]=d.split('-');return day+'/'+m+'/'+y;}
-function videoBtn(url,tipo){if(!url)return'<span class="no-video">—</span>';return'<a href="'+url+'" target="_blank" class="video-link"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>'+(tipo||'Ver')+'</a>';}
-function compTag(c){const l={liga:'Liga',copa:'Copa',amistoso:'Amistoso'};return'<span class="comp-tag '+c+'">'+(l[c]||c)+'</span>';}
-function showToast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+type;setTimeout(()=>t.className='',3000);}
-function setSyncStatus(s){const el=document.getElementById('sync-indicator'),txt=document.getElementById('sync-text');el.className=s;txt.textContent=s==='live'?'● EN VIVO':s==='offline'?'SIN CONEXIÓN':'CONECTANDO';}
-function renderOverview(){const w=matches.filter(m=>+m.ga>+m.gr).length,dr=matches.filter(m=>+m.ga===+m.gr).length,l=matches.filter(m=>+m.ga<+m.gr).length,gf=matches.reduce((s,m)=>s+(+m.ga),0),gc=matches.reduce((s,m)=>s+(+m.gr),0);document.getElementById('stats-row').innerHTML='<div class="stat-card"><div class="stat-num">'+matches.length+'</div><div class="stat-label">Partidos</div></div><div class="stat-card win"><div class="stat-num">'+w+'</div><div class="stat-label">Victorias</div></div><div class="stat-card draw"><div class="stat-num">'+dr+'</div><div class="stat-label">Empates</div></div><div class="stat-card loss"><div class="stat-num">'+l+'</div><div class="stat-label">Derrotas</div></div><div class="stat-card"><div class="stat-num">'+gf+'<span style="color:var(--muted);font-size:22px">/'+ gc+'</span></div><div class="stat-label">GF / GC</div></div>';}
-function renderMatches(){const s=[...matches].sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));document.getElementById('all-count').textContent=s.length+' partidos';document.getElementById('all-tbody').innerHTML=s.length===0?'<tr><td colspan="9" class="empty-state">Sin partidos registrados aún</td></tr>':s.map((m,i)=>{const r=getResult(m.ga,m.gr);return'<tr class="match-row"><td style="color:var(--muted);font-family:monospace;font-size:11px">'+String(i+1).padStart(2,'0')+'</td><td><span class="result-pill '+r+'">'+r+'</span></td><td><span class="rival-name">'+m.rival+'</span></td><td><span class="score-badge">'+m.ga+' — '+m.gr+'</span></td><td>'+compTag(m.comp)+'</td><td style="color:var(--muted2);font-size:12px">'+(m.jornada||'—')+'</td><td style="color:var(--muted);font-size:12px">'+formatDate(m.fecha)+'</td><td style="color:var(--muted2);font-size:12px;max-width:160px">'+(m.notas||'—')+'</td><td>'+videoBtn(m.video,m.vtipo)+'</td></tr>';}).join('');}
-function renderVideos(){const wv=matches.filter(m=>m.video);document.getElementById('video-count').textContent=wv.length+' videos';document.getElementById('videos-grid').innerHTML=wv.length===0?'<div class="empty-state" style="grid-column:1/-1">No hay videos registrados aún</div>':wv.map(m=>'<a href="'+m.video+'" target="_blank" class="video-card" style="text-decoration:none;color:inherit"><div class="video-thumb"><div class="video-type-tag">'+(m.vtipo||'Video')+'</div><div class="play-icon"><svg viewBox="0 0 24 24" fill="var(--gold)"><path d="M8 5v14l11-7z"/></svg></div></div><div class="video-info"><div class="video-title">vs '+m.rival+'</div><div class="video-meta">'+compTag(m.comp)+' · '+formatDate(m.fecha)+'</div>'+(m.notas?'<div style="font-size:11px;color:var(--muted);margin-top:6px">'+m.notas+'</div>':'')+'</div></a>').join('');}
-function renderManageTable(){const s=[...matches].sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));document.getElementById('manage-tbody').innerHTML=s.length===0?'<tr><td colspan="6" class="empty-state">Sin partidos registrados</td></tr>':s.map(m=>{const r=getResult(m.ga,m.gr);return'<tr class="manage-row"><td style="color:var(--muted);font-size:12px">'+formatDate(m.fecha)+'</td><td><strong>'+m.rival+'</strong></td><td><span class="result-pill '+r+'" style="margin-right:6px">'+r+'</span><span class="score-badge" style="font-size:15px">'+m.ga+'–'+m.gr+'</span></td><td>'+compTag(m.comp)+'</td><td>'+(m.video?'<a href="'+m.video+'" target="_blank" style="color:var(--gold);font-size:11px">▶ Ver</a>':'<span style="color:var(--muted);font-size:11px">—</span>')+'</td><td><div class="action-btns"><button class="btn-edit" onclick="openEdit(''+m.id+'')">✏️ Editar</button><button class="btn-delete" onclick="openDelete(''+m.id+'',''+m.rival.replace(/'/g,'')+'')">🗑️ Borrar</button></div></td></tr>';}).join('');}
-function renderAll(){renderOverview();renderMatches();renderVideos();if(isAdmin)renderManageTable();}
-onSnapshot(collection(db,'partidos'),snap=>{matches=snap.docs.map(d=>({id:d.id,...d.data()}));renderAll();setSyncStatus('live');setTimeout(()=>document.getElementById('loading-screen').classList.add('hide'),800);},err=>{console.error(err);setSyncStatus('offline');document.getElementById('loading-screen').classList.add('hide');showToast('Error conectando con Firebase','error');});
-window.addMatch=async function(){const rival=document.getElementById('f-rival').value.trim(),fecha=document.getElementById('f-fecha').value;if(!rival||!fecha){showToast('Completa rival y fecha','error');return;}const btn=document.getElementById('btn-add-match');btn.disabled=true;btn.textContent='Guardando...';try{await addDoc(collection(db,'partidos'),{rival,fecha,ga:parseInt(document.getElementById('f-ga').value)||0,gr:parseInt(document.getElementById('f-gr').value)||0,comp:document.getElementById('f-comp').value,jornada:document.getElementById('f-jornada').value,video:document.getElementById('f-video').value,vtipo:document.getElementById('f-vtipo').value,notas:document.getElementById('f-notas').value,createdAt:new Date().toISOString()});['f-rival','f-ga','f-gr','f-jornada','f-video','f-notas'].forEach(id=>document.getElementById(id).value='');showToast('✅ Partido guardado en la nube');}catch(e){showToast('Error guardando partido','error');}btn.disabled=false;btn.textContent='+ Registrar Partido';};
-window.openEdit=function(id){const m=matches.find(x=>x.id===id);if(!m)return;document.getElementById('edit-id').value=id;document.getElementById('e-rival').value=m.rival||'';document.getElementById('e-fecha').value=m.fecha||'';document.getElementById('e-ga').value=m.ga??0;document.getElementById('e-gr').value=m.gr??0;document.getElementById('e-comp').value=m.comp||'liga';document.getElementById('e-jornada').value=m.jornada||'';document.getElementById('e-video').value=m.video||'';document.getElementById('e-vtipo').value=m.vtipo||'Análisis';document.getElementById('e-notas').value=m.notas||'';document.getElementById('edit-modal').classList.remove('hide');};
-window.saveEdit=async function(){const id=document.getElementById('edit-id').value,rival=document.getElementById('e-rival').value.trim(),fecha=document.getElementById('e-fecha').value;if(!rival||!fecha){showToast('Completa rival y fecha','error');return;}try{await updateDoc(doc(db,'partidos',id),{rival,fecha,ga:parseInt(document.getElementById('e-ga').value)||0,gr:parseInt(document.getElementById('e-gr').value)||0,comp:document.getElementById('e-comp').value,jornada:document.getElementById('e-jornada').value,video:document.getElementById('e-video').value,vtipo:document.getElementById('e-vtipo').value,notas:document.getElementById('e-notas').value,updatedAt:new Date().toISOString()});closeEditModal();showToast('✅ Partido actualizado');}catch(e){showToast('Error actualizando partido','error');};};
-window.closeEditModal=function(){document.getElementById('edit-modal').classList.add('hide');};
-window.openDelete=function(id,rival){document.getElementById('confirm-id').value=id;document.getElementById('confirm-text').textContent='¿Seguro que quieres borrar el partido vs '+rival+'? Esta acción no se puede deshacer.';document.getElementById('confirm-modal').classList.remove('hide');};
-window.confirmDelete=async function(){const id=document.getElementById('confirm-id').value;try{await deleteDoc(doc(db,'partidos',id));closeConfirmModal();showToast('🗑️ Partido eliminado');}catch(e){showToast('Error eliminando partido','error');};};
-window.closeConfirmModal=function(){document.getElementById('confirm-modal').classList.add('hide');};
-window.handleAdminClick=function(btn){if(isAdmin){switchTab('admin',btn);}else{document.getElementById('pin-modal').classList.remove('hide');document.getElementById('pin-input').focus();}};
-window.checkPin=function(){const val=document.getElementById('pin-input').value;if(val===ADMIN_PIN){isAdmin=true;document.getElementById('pin-modal').classList.add('hide');document.getElementById('pin-input').value='';document.getElementById('pin-error').textContent='';const btn=document.getElementById('admin-tab-btn');btn.classList.add('unlocked');btn.textContent='⚡ Analista';renderManageTable();switchTab('admin',btn);showToast('✅ Acceso de analista activado');}else{document.getElementById('pin-error').textContent='PIN incorrecto';document.getElementById('pin-input').value='';}};
-window.closePinModal=function(){document.getElementById('pin-modal').classList.add('hide');document.getElementById('pin-input').value='';document.getElementById('pin-error').textContent='';};
-window.switchTab=function(name,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');};
-document.getElementById('pin-input').addEventListener('keydown',e=>{if(e.key==='Enter')window.checkPin();});
-</script>
-</body>
-</html><!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aragua FC Sub-19 · Portal de Rendimiento</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --gold: #F0B429; --gold-dim: #A87A1A; --gold-glow: rgba(240,180,41,0.15);
-    --bg: #07090E; --bg2: #0D1118; --bg3: #131927; --bg4: #1A2235;
-    --border: rgba(240,180,41,0.15); --border-bright: rgba(240,180,41,0.4);
-    --text: #E8ECF4; --muted: #5A6A8A; --muted2: #8892B0;
-    --win: #27AE60; --draw: #F39C12; --loss: #C0392B;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
-  #loading-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1rem; transition: opacity 0.4s; }
-  #loading-screen.hide { opacity: 0; pointer-events: none; }
-  .loading-badge { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 4px; color: var(--gold); }
-  .loading-bar { width: 200px; height: 2px; background: var(--bg3); border-radius: 1px; overflow: hidden; }
-  .loading-fill { height: 100%; background: var(--gold); animation: loadAnim 1.5s ease infinite; }
-  @keyframes loadAnim { 0% { width: 0%; } 70% { width: 100%; } 100% { width: 100%; } }
-  .loading-text { font-size: 11px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
-  .modal-overlay { position: fixed; inset: 0; background: rgba(7,9,14,0.92); z-index: 100; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-  .modal-overlay.hide { display: none; }
-  .modal-box { background: var(--bg3); border: 1px solid var(--border-bright); border-radius: 12px; padding: 2.5rem; width: 320px; text-align: center; }
-  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; color: var(--gold); margin-bottom: 0.5rem; }
-  .modal-sub { font-size: 12px; color: var(--muted); letter-spacing: 1px; margin-bottom: 1.5rem; }
-  .pin-input { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 24px; text-align: center; letter-spacing: 8px; padding: 12px; outline: none; transition: border-color 0.2s; }
-  .pin-input:focus { border-color: var(--gold); }
-  .pin-error { font-size: 11px; color: var(--loss); margin-top: 8px; min-height: 16px; }
-  .btn-pin { width: 100%; background: var(--gold); color: var(--bg); border: none; border-radius: 8px; font-family: 'DM Sans'; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 12px; cursor: pointer; margin-top: 1rem; transition: background 0.2s; }
-  .btn-pin:hover { background: #D4A020; }
-  .btn-cancel { background: none; border: none; color: var(--muted); font-size: 11px; cursor: pointer; margin-top: 0.75rem; display: block; width: 100%; letter-spacing: 1px; }
-  .btn-cancel:hover { color: var(--text); }
-  header { position: relative; z-index: 10; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, rgba(13,17,24,0.98) 0%, rgba(7,9,14,0.95) 100%); backdrop-filter: blur(10px); }
-  .header-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 72px; }
-  .logo-group { display: flex; align-items: center; gap: 1rem; }
-  .club-badge { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--gold) 0%, #7A5A00 100%); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--bg); letter-spacing: 1px; box-shadow: 0 0 20px rgba(240,180,41,0.3); flex-shrink: 0; }
-  .logo-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: var(--gold); line-height: 1; }
-  .logo-sub { font-size: 10px; letter-spacing: 4px; color: var(--muted2); text-transform: uppercase; }
-  .header-right { display: flex; align-items: center; gap: 1rem; }
-  .season-badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold); background: var(--gold-glow); border: 1px solid var(--border-bright); padding: 4px 12px; border-radius: 4px; letter-spacing: 1px; }
-  .analyst-tag { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
-  #sync-indicator { font-size: 10px; letter-spacing: 2px; color: var(--win); display: flex; align-items: center; gap: 4px; }
-  #sync-indicator.syncing { color: var(--draw); }
-  #sync-indicator.offline { color: var(--loss); }
-  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-  .nav-tabs { position: sticky; top: 0; z-index: 9; background: rgba(7,9,14,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
-  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; gap: 0; }
-  .tab-btn { background: none; border: none; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 16px 24px; cursor: pointer; position: relative; transition: color 0.2s; }
-  .tab-btn::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--gold); transform: scaleX(0); transition: transform 0.2s; }
-  .tab-btn.active { color: var(--gold); }
-  .tab-btn.active::after { transform: scaleX(1); }
-  .tab-btn:hover { color: var(--text); }
-  .tab-btn.admin-btn.unlocked { color: var(--gold); }
-  main { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem; }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; animation: fadeUp 0.4s ease both; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-  .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2.5rem; }
-  .stat-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1rem; text-align: center; position: relative; overflow: hidden; transition: border-color 0.2s, transform 0.2s; }
-  .stat-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
-  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--gold); opacity: 0.6; }
-  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 42px; line-height: 1; color: var(--gold); letter-spacing: 1px; }
-  .stat-label { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
-  .stat-card.win .stat-num { color: var(--win); } .stat-card.win::before { background: var(--win); }
-  .stat-card.draw .stat-num { color: var(--draw); } .stat-card.draw::before { background: var(--draw); }
-  .stat-card.loss .stat-num { color: var(--loss); } .stat-card.loss::before { background: var(--loss); }
-  .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
-  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: var(--text); }
-  .section-line { flex: 1; height: 1px; background: var(--border); }
-  .section-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
-  .matches-table { width: 100%; border-collapse: collapse; }
-  .matches-table th { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; text-align: left; padding: 10px 16px; border-bottom: 1px solid var(--border); font-weight: 500; }
-  .matches-table td { padding: 14px 16px; border-bottom: 1px solid rgba(240,180,41,0.06); font-size: 13.5px; vertical-align: middle; }
-  .matches-table tr:last-child td { border-bottom: none; }
-  .match-row { background: var(--bg3); transition: background 0.15s; }
-  .match-row:hover { background: var(--bg4); }
-  .result-pill { display: inline-block; width: 28px; text-align: center; padding: 3px 0; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 1px; }
-  .result-pill.V { background: rgba(39,174,96,0.2); color: var(--win); }
-  .result-pill.E { background: rgba(243,156,18,0.2); color: var(--draw); }
-  .result-pill.D { background: rgba(192,57,43,0.2); color: var(--loss); }
-  .score-badge { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--text); }
-  .rival-name { font-weight: 500; }
-  .video-link { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--gold); text-decoration: none; background: var(--gold-glow); border: 1px solid var(--border-bright); padding: 5px 12px; border-radius: 4px; transition: background 0.2s; font-weight: 500; }
-  .video-link:hover { background: rgba(240,180,41,0.25); border-color: var(--gold); }
-  .video-link svg { width: 12px; height: 12px; }
-  .no-video { font-size: 11px; color: var(--muted); }
-  .comp-tag { font-size: 10px; padding: 2px 8px; border-radius: 3px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
-  .comp-tag.liga { background: rgba(39,174,96,0.15); color: #27AE60; }
-  .comp-tag.copa { background: rgba(52,152,219,0.15); color: #3498DB; }
-  .comp-tag.amistoso { background: rgba(90,106,138,0.2); color: var(--muted2); }
-  .perf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-  .perf-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
-  .perf-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 3px; color: var(--muted2); margin-bottom: 1.25rem; }
-  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-  .bar-label { font-size: 12px; color: var(--muted2); width: 130px; flex-shrink: 0; }
-  .bar-track { flex: 1; height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); transition: width 1s cubic-bezier(0.4,0,0.2,1); }
-  .bar-val { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold); width: 36px; text-align: right; flex-shrink: 0; }
-  .player-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-  .player-row:last-child { border-bottom: none; }
-  .player-num { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--gold); width: 24px; text-align: center; flex-shrink: 0; }
-  .player-info { flex: 1; }
-  .player-name { font-size: 13.5px; font-weight: 500; }
-  .player-pos { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
-  .player-stat { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--gold); font-weight: 600; }
-  .videos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-  .video-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color 0.2s, transform 0.2s; }
-  .video-card:hover { border-color: var(--border-bright); transform: translateY(-3px); }
-  .video-thumb { aspect-ratio: 16/9; background: var(--bg2); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-  .video-thumb::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(240,180,41,0.08) 0%, transparent 60%); }
-  .play-icon { width: 44px; height: 44px; background: rgba(240,180,41,0.15); border: 2px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.2s; }
-  .video-card:hover .play-icon { background: rgba(240,180,41,0.3); transform: scale(1.1); }
-  .play-icon svg { width: 18px; height: 18px; margin-left: 2px; }
-  .video-type-tag { position: absolute; top: 10px; left: 10px; font-size: 9px; letter-spacing: 2px; color: var(--gold); background: rgba(7,9,14,0.85); border: 1px solid var(--border-bright); padding: 3px 8px; border-radius: 3px; text-transform: uppercase; }
-  .video-info { padding: 1rem; }
-  .video-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
-  .video-meta { font-size: 11px; color: var(--muted); }
-  .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-  .form-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 1.75rem; }
-  .form-title { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; color: var(--gold); margin-bottom: 1.5rem; }
-  .form-group { margin-bottom: 1rem; }
-  label { display: block; font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
-  input, select, textarea { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13.5px; padding: 10px 14px; outline: none; transition: border-color 0.2s; }
-  input:focus, select:focus, textarea:focus { border-color: var(--gold); }
-  select option { background: var(--bg2); }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .btn-submit { width: 100%; background: var(--gold); color: var(--bg); border: none; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 12px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s, transform 0.1s; }
-  .btn-submit:hover { background: #D4A020; transform: translateY(-1px); }
-  .btn-submit:disabled { background: var(--muted); cursor: not-allowed; transform: none; }
-  #toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--bg3); border: 1px solid var(--border-bright); color: var(--text); padding: 12px 20px; border-radius: 8px; font-size: 13px; z-index: 999; transform: translateY(80px); opacity: 0; transition: all 0.3s; }
-  #toast.show { transform: translateY(0); opacity: 1; }
-  #toast.success { border-color: var(--win); color: var(--win); }
-  #toast.error { border-color: var(--loss); color: var(--loss); }
-  .empty-state { text-align: center; padding: 4rem 2rem; color: var(--muted); }
-  @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(3, 1fr); } .perf-grid { grid-template-columns: 1fr; } .videos-grid { grid-template-columns: 1fr 1fr; } .admin-grid { grid-template-columns: 1fr; } .tab-btn { padding: 14px 12px; font-size: 10px; } }
-</style>
-</head>
-<body>
-<div id="loading-screen"><div class="loading-badge">ARAGUA FC · SUB-19</div><div class="loading-bar"><div class="loading-fill"></div></div><div class="loading-text">Cargando datos...</div></div>
-<div class="modal-overlay hide" id="pin-modal"><div class="modal-box"><div class="modal-title">🔐 Acceso Analista</div><div class="modal-sub">Ingresa tu PIN para editar</div><input type="password" class="pin-input" id="pin-input" maxlength="4" placeholder="····" inputmode="numeric"><div class="pin-error" id="pin-error"></div><button class="btn-pin" onclick="checkPin()">Entrar</button><button class="btn-cancel" onclick="closePinModal()">Cancelar</button></div></div>
-<div id="toast"></div>
-<header><div class="header-inner"><div class="logo-group"><div class="club-badge">AFC</div><div><div class="logo-title">Aragua FC · Sub-19</div><div class="logo-sub">Portal de Rendimiento</div></div></div><div class="header-right"><div id="sync-indicator" class="syncing"><div class="sync-dot"></div><span id="sync-text">CONECTANDO</span></div><span class="season-badge">TEMPORADA 2025</span><span class="analyst-tag">Armando Uban · Analista</span></div></div></header>
-<nav class="nav-tabs"><div class="nav-inner"><button class="tab-btn active" onclick="switchTab('overview', this)">Resumen</button><button class="tab-btn" onclick="switchTab('matches', this)">Partidos</button><button class="tab-btn" onclick="switchTab('rendimiento', this)">Rendimiento</button><button class="tab-btn" onclick="switchTab('videos', this)">Videos</button><button class="tab-btn admin-btn" id="admin-tab-btn" onclick="handleAdminClick(this)">🔐 Analista</button></div></nav>
-<main>
-  <div id="tab-overview" class="tab-panel active"><div class="stats-row" id="stats-row"><div class="stat-card"><div class="stat-num">—</div><div class="stat-label">Partidos</div></div></div><div class="section-header"><span class="section-title">Últimos Resultados</span><div class="section-line"></div><span class="section-count" id="recent-count"></span></div><table class="matches-table"><thead><tr><th>Resultado</th><th>Rival</th><th>Marcador</th><th>Competencia</th><th>Fecha</th><th>Video</th></tr></thead><tbody id="recent-tbody"></tbody></table></div>
-  <div id="tab-matches" class="tab-panel"><div class="section-header"><span class="section-title">Todos los Partidos</span><div class="section-line"></div><span class="section-count" id="all-count"></span></div><table class="matches-table"><thead><tr><th>#</th><th>Res.</th><th>Rival</th><th>Marcador</th><th>Comp.</th><th>Jornada</th><th>Fecha</th><th>Notas</th><th>Video</th></tr></thead><tbody id="all-tbody"></tbody></table></div>
-  <div id="tab-rendimiento" class="tab-panel"><div class="perf-grid"><div class="perf-card"><div class="perf-card-title">Métricas de Equipo</div><div id="team-bars"></div></div><div class="perf-card"><div class="perf-card-title">Goleadores</div><div id="scorers-list"></div></div><div class="perf-card"><div class="perf-card-title">Fases de Juego</div><div id="phase-bars"></div></div><div class="perf-card"><div class="perf-card-title">Asistencias</div><div id="assists-list"></div></div></div></div>
-  <div id="tab-videos" class="tab-panel"><div class="section-header"><span class="section-title">Análisis en Video</span><div class="section-line"></div><span class="section-count" id="video-count"></span></div><div class="videos-grid" id="videos-grid"></div></div>
-  <div id="tab-admin" class="tab-panel"><div class="admin-grid"><div class="form-card"><div class="form-title">Registrar Partido</div><div class="form-row"><div class="form-group"><label>Rival</label><input id="f-rival" type="text" placeholder="Nombre del equipo"></div><div class="form-group"><label>Fecha</label><input id="f-fecha" type="date"></div></div><div class="form-row"><div class="form-group"><label>Goles Aragua</label><input id="f-ga" type="number" min="0" placeholder="0"></div><div class="form-group"><label>Goles Rival</label><input id="f-gr" type="number" min="0" placeholder="0"></div></div><div class="form-row"><div class="form-group"><label>Competencia</label><select id="f-comp"><option value="liga">Liga</option><option value="copa">Copa</option><option value="amistoso">Amistoso</option></select></div><div class="form-group"><label>Jornada / Fase</label><input id="f-jornada" type="text" placeholder="J1, Cuartos..."></div></div><div class="form-group"><label>Link de Video</label><input id="f-video" type="url" placeholder="https://..."></div><div class="form-group"><label>Tipo de Video</label><select id="f-vtipo"><option value="Análisis">Análisis Táctico</option><option value="Highlights">Highlights</option><option value="Set Pieces">Balón Parado</option><option value="Presión">Presión Alta</option></select></div><div class="form-group"><label>Notas del Analista</label><textarea id="f-notas" rows="2" placeholder="Observaciones clave..."></textarea></div><button class="btn-submit" id="btn-add-match" onclick="addMatch()">Registrar Partido</button></div><div><div class="form-card" style="margin-bottom:1.5rem"><div class="form-title">Actualizar Jugador</div><div class="form-group"><label>Nombre</label><input id="p-nombre" type="text" placeholder="Nombre del jugador"></div><div class="form-row"><div class="form-group"><label>Posición</label><select id="p-pos"><option value="POR">Portero</option><option value="DEF">Defensa</option><option value="MED">Mediocampista</option><option value="DEL">Delantero</option></select></div><div class="form-group"><label>Goles</label><input id="p-goles" type="number" min="0" placeholder="0"></div></div><div class="form-group"><label>Asistencias</label><input id="p-asist" type="number" min="0" placeholder="0"></div><button class="btn-submit" onclick="savePlayer()">Guardar Jugador</button></div><div class="form-card"><div class="form-title">Métricas de Equipo</div><div class="form-group"><label>Posesión promedio (%)</label><input id="m-posesion" type="number" min="0" max="100" placeholder="54"></div><div class="form-row"><div class="form-group"><label>Pases completados (%)</label><input id="m-pases" type="number" min="0" max="100" placeholder="76"></div><div class="form-group"><label>Duelos ganados (%)</label><input id="m-duelos" type="number" min="0" max="100" placeholder="58"></div></div><div class="form-row"><div class="form-group"><label>Tiros a puerta (%)</label><input id="m-tiros" type="number" min="0" max="100" placeholder="42"></div><div class="form-group"><label>Presión alta (%)</label><input id="m-presion" type="number" min="0" max="100" placeholder="63"></div></div><button class="btn-submit" onclick="saveMetrics()">Guardar Métricas</button></div></div></div></div>
-</main>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, doc, addDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-const firebaseConfig = { apiKey: "AIzaSyC3qThe7VZlVeMO_P0jV1PcQ5j4ZG_AUcU", authDomain: "au-ar-aragua-sub-19.firebaseapp.com", projectId: "au-ar-aragua-sub-19", storageBucket: "au-ar-aragua-sub-19.firebasestorage.app", messagingSenderId: "576436448748", appId: "1:576436448748:web:16744c40736382f13b24c9" };
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const ADMIN_PIN = '2121';
-let isAdmin = false, matches = [], players = [], metrics = { posesion:54, pases:76, duelos:58, tiros:42, presion:63, ofensivo:68, defensivo:72, transicion:55, abp:60 };
-function getResult(ga,gr){ return ga>gr?'V':ga<gr?'D':'E'; }
-function formatDate(d){ if(!d)return'—'; const[y,m,day]=d.split('-'); return day+'/'+m+'/'+y; }
-function videoBtn(url,tipo){ if(!url)return'<span class="no-video">—</span>'; return'<a href="'+url+'" target="_blank" class="video-link"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>'+(tipo||'Ver')+'</a>'; }
-function compTag(c){ const l={liga:'Liga',copa:'Copa',amistoso:'Amistoso'}; return'<span class="comp-tag '+c+'">'+(l[c]||c)+'</span>'; }
-function showToast(msg,type='success'){ const t=document.getElementById('toast'); t.textContent=msg; t.className='show '+type; setTimeout(()=>t.className='',3000); }
-function setSyncStatus(status){ const el=document.getElementById('sync-indicator'),txt=document.getElementById('sync-text'); el.className=status; txt.textContent=status==='syncing'?'CONECTANDO':status==='offline'?'SIN CONEXIÓN':'● EN VIVO'; }
-function renderOverview(){ const w=matches.filter(m=>m.ga>m.gr).length,dr=matches.filter(m=>m.ga===m.gr).length,l=matches.filter(m=>m.ga<m.gr).length,gf=matches.reduce((s,m)=>s+Number(m.ga),0),gc=matches.reduce((s,m)=>s+Number(m.gr),0); document.getElementById('stats-row').innerHTML='<div class="stat-card"><div class="stat-num">'+matches.length+'</div><div class="stat-label">Partidos</div></div><div class="stat-card win"><div class="stat-num">'+w+'</div><div class="stat-label">Victorias</div></div><div class="stat-card draw"><div class="stat-num">'+dr+'</div><div class="stat-label">Empates</div></div><div class="stat-card loss"><div class="stat-num">'+l+'</div><div class="stat-label">Derrotas</div></div><div class="stat-card"><div class="stat-num">'+gf+'<span style="color:var(--muted);font-size:22px">/'+ gc+'</span></div><div class="stat-label">GF / GC</div></div>'; const rec=[...matches].sort((a,b)=>b.fecha?.localeCompare(a.fecha)).slice(0,5); document.getElementById('recent-count').textContent='Últimos '+rec.length; document.getElementById('recent-tbody').innerHTML=rec.map(m=>{const r=getResult(m.ga,m.gr);return'<tr class="match-row"><td><span class="result-pill '+r+'">'+r+'</span></td><td><span class="rival-name">'+m.rival+'</span></td><td><span class="score-badge">'+m.ga+' — '+m.gr+'</span></td><td>'+compTag(m.comp)+'</td><td style="color:var(--muted);font-size:12px">'+formatDate(m.fecha)+'</td><td>'+videoBtn(m.video,m.vtipo)+'</td></tr>';}).join(''); }
-function renderMatches(){ const s=[...matches].sort((a,b)=>a.fecha?.localeCompare(b.fecha)); document.getElementById('all-count').textContent=s.length+' partidos'; document.getElementById('all-tbody').innerHTML=s.length===0?'<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:2rem">Sin partidos registrados</td></tr>':s.map((m,i)=>{const r=getResult(m.ga,m.gr);return'<tr class="match-row"><td style="color:var(--muted);font-family:monospace;font-size:11px">'+String(i+1).padStart(2,'0')+'</td><td><span class="result-pill '+r+'">'+r+'</span></td><td>'+m.rival+'</td><td><span class="score-badge">'+m.ga+' — '+m.gr+'</span></td><td>'+compTag(m.comp)+'</td><td style="color:var(--muted2);font-size:12px">'+(m.jornada||'—')+'</td><td style="color:var(--muted);font-size:12px">'+formatDate(m.fecha)+'</td><td style="color:var(--muted2);font-size:12px">'+(m.notas||'—')+'</td><td>'+videoBtn(m.video,m.vtipo)+'</td></tr>';}).join(''); }
-function renderRendimiento(){ const br=(l,v)=>'<div class="bar-row"><span class="bar-label">'+l+'</span><div class="bar-track"><div class="bar-fill" style="width:'+v+'%"></div></div><span class="bar-val">'+v+'%</span></div>'; document.getElementById('team-bars').innerHTML=br('Posesión',metrics.posesion)+br('Pases',metrics.pases)+br('Duelos',metrics.duelos)+br('Tiros',metrics.tiros)+br('Presión alta',metrics.presion); document.getElementById('phase-bars').innerHTML=br('Ofensiva',metrics.ofensivo)+br('Defensiva',metrics.defensivo)+br('Transición',metrics.transicion)+br('ABP',metrics.abp); const sg=[...players].sort((a,b)=>b.goles-a.goles).slice(0,5),sa=[...players].sort((a,b)=>b.asist-a.asist).slice(0,5); const pR=(p,i,v,lbl)=>'<div class="player-row"><span class="player-num">'+(i+1)+'</span><div class="player-info"><div class="player-name">'+p.nombre+'</div><div class="player-pos">'+p.pos+'</div></div><span class="player-stat">'+v+' '+lbl+'</span></div>'; document.getElementById('scorers-list').innerHTML=sg.length?sg.map((p,i)=>pR(p,i,p.goles,'goles')).join(''):'<p style="color:var(--muted);font-size:12px">Sin datos</p>'; document.getElementById('assists-list').innerHTML=sa.length?sa.map((p,i)=>pR(p,i,p.asist,'asist.')).join(''):'<p style="color:var(--muted);font-size:12px">Sin datos</p>'; }
-function renderVideos(){ const wv=matches.filter(m=>m.video); document.getElementById('video-count').textContent=wv.length+' videos'; document.getElementById('videos-grid').innerHTML=wv.length===0?'<div class="empty-state" style="grid-column:1/-1"><p>No hay videos registrados aún</p></div>':wv.map(m=>'<a href="'+m.video+'" target="_blank" class="video-card" style="text-decoration:none;color:inherit"><div class="video-thumb"><div class="video-type-tag">'+m.vtipo+'</div><div class="play-icon"><svg viewBox="0 0 24 24" fill="var(--gold)"><path d="M8 5v14l11-7z"/></svg></div></div><div class="video-info"><div class="video-title">vs '+m.rival+'</div><div class="video-meta">'+compTag(m.comp)+' · '+formatDate(m.fecha)+'</div>'+(m.notas?'<div style="font-size:11px;color:var(--muted);margin-top:6px">'+m.notas+'</div>':'')+'</div></a>').join(''); }
-function renderAll(){ renderOverview(); renderMatches(); renderRendimiento(); renderVideos(); }
-async function initFirestore(){ try{ onSnapshot(collection(db,'partidos'),snap=>{ matches=snap.docs.map(d=>({id:d.id,...d.data()})); renderAll(); setSyncStatus(''); }); onSnapshot(collection(db,'jugadores'),snap=>{ players=snap.docs.map(d=>({id:d.id,...d.data()})); renderRendimiento(); }); onSnapshot(doc(db,'config','metricas'),snap=>{ if(snap.exists()){metrics={...metrics,...snap.data()};renderRendimiento();} }); setTimeout(()=>document.getElementById('loading-screen').classList.add('hide'),1000); }catch(e){ console.error(e); setSyncStatus('offline'); document.getElementById('loading-screen').classList.add('hide'); showToast('Error conectando a Firebase','error'); } }
-window.addMatch=async function(){ const rival=document.getElementById('f-rival').value.trim(),fecha=document.getElementById('f-fecha').value,ga=parseInt(document.getElementById('f-ga').value)||0,gr=parseInt(document.getElementById('f-gr').value)||0; if(!rival||!fecha){showToast('Completa rival y fecha','error');return;} const btn=document.getElementById('btn-add-match'); btn.disabled=true;btn.textContent='Guardando...'; try{ await addDoc(collection(db,'partidos'),{rival,fecha,ga,gr,comp:document.getElementById('f-comp').value,jornada:document.getElementById('f-jornada').value,video:document.getElementById('f-video').value,vtipo:document.getElementById('f-vtipo').value,notas:document.getElementById('f-notas').value,createdAt:new Date().toISOString()}); ['f-rival','f-ga','f-gr','f-jornada','f-video','f-notas'].forEach(id=>document.getElementById(id).value=''); showToast('✅ Partido guardado en la nube'); switchTab('matches',document.querySelector('.tab-btn:nth-child(2)')); }catch(e){showToast('Error guardando partido','error');} btn.disabled=false;btn.textContent='Registrar Partido'; };
-window.savePlayer=async function(){ const nombre=document.getElementById('p-nombre').value.trim(); if(!nombre){showToast('Ingresa el nombre del jugador','error');return;} try{ await setDoc(doc(db,'jugadores',nombre.toLowerCase().replace(/\s+/g,'-')),{nombre,pos:document.getElementById('p-pos').value,goles:parseInt(document.getElementById('p-goles').value)||0,asist:parseInt(document.getElementById('p-asist').value)||0}); ['p-nombre','p-goles','p-asist'].forEach(id=>document.getElementById(id).value=''); showToast('✅ Jugador guardado en la nube'); }catch(e){showToast('Error guardando jugador','error');} };
-window.saveMetrics=async function(){ const nm={posesion:parseInt(document.getElementById('m-posesion').value)||metrics.posesion,pases:parseInt(document.getElementById('m-pases').value)||metrics.pases,duelos:parseInt(document.getElementById('m-duelos').value)||metrics.duelos,tiros:parseInt(document.getElementById('m-tiros').value)||metrics.tiros,presion:parseInt(document.getElementById('m-presion').value)||metrics.presion,ofensivo:metrics.ofensivo,defensivo:metrics.defensivo,transicion:metrics.transicion,abp:metrics.abp}; try{ await setDoc(doc(db,'config','metricas'),nm); showToast('✅ Métricas guardadas en la nube'); switchTab('rendimiento',document.querySelector('.tab-btn:nth-child(3)')); }catch(e){showToast('Error guardando métricas','error');} };
-window.handleAdminClick=function(btn){ if(isAdmin){switchTab('admin',btn);}else{document.getElementById('pin-modal').classList.remove('hide');document.getElementById('pin-input').focus();} };
-window.checkPin=function(){ const val=document.getElementById('pin-input').value; if(val===ADMIN_PIN){ isAdmin=true; document.getElementById('pin-modal').classList.add('hide'); document.getElementById('pin-input').value=''; document.getElementById('pin-error').textContent=''; const ab=document.getElementById('admin-tab-btn'); ab.classList.add('unlocked'); ab.textContent='⚡ Analista'; switchTab('admin',ab); showToast('✅ Acceso de analista activado'); }else{ document.getElementById('pin-error').textContent='PIN incorrecto'; document.getElementById('pin-input').value=''; } };
-window.closePinModal=function(){ document.getElementById('pin-modal').classList.add('hide'); document.getElementById('pin-input').value=''; document.getElementById('pin-error').textContent=''; };
-window.switchTab=function(name,btn){ document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.getElementById('tab-'+name).classList.add('active'); if(btn)btn.classList.add('active'); };
-document.getElementById('pin-input').addEventListener('keydown',e=>{if(e.key==='Enter')window.checkPin();});
-initFirestore();
-</script>
-</body>
-</html><!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aragua FC Sub-19 · Portal de Rendimiento</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --gold: #F0B429;
-    --gold-dim: #A87A1A;
-    --gold-glow: rgba(240,180,41,0.15);
-    --red: #C0392B;
-    --bg: #07090E;
-    --bg2: #0D1118;
-    --bg3: #131927;
-    --bg4: #1A2235;
-    --border: rgba(240,180,41,0.15);
-    --border-bright: rgba(240,180,41,0.4);
-    --text: #E8ECF4;
-    --muted: #5A6A8A;
-    --muted2: #8892B0;
-    --win: #27AE60;
-    --draw: #F39C12;
-    --loss: #C0392B;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
-  body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.6; }
-  header { position: relative; z-index: 10; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, rgba(13,17,24,0.98) 0%, rgba(7,9,14,0.95) 100%); backdrop-filter: blur(10px); }
-  .header-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 72px; }
-  .logo-group { display: flex; align-items: center; gap: 1rem; }
-  .club-badge { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--gold) 0%, #7A5A00 100%); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--bg); letter-spacing: 1px; box-shadow: 0 0 20px rgba(240,180,41,0.3); flex-shrink: 0; }
-  .logo-text { display: flex; flex-direction: column; gap: 1px; }
-  .logo-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: var(--gold); line-height: 1; }
-  .logo-sub { font-size: 10px; letter-spacing: 4px; color: var(--muted2); text-transform: uppercase; }
-  .header-meta { display: flex; align-items: center; gap: 1.5rem; }
-  .season-badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold); background: var(--gold-glow); border: 1px solid var(--border-bright); padding: 4px 12px; border-radius: 4px; letter-spacing: 1px; }
-  .analyst-tag { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
-  .nav-tabs { position: sticky; top: 0; z-index: 9; background: rgba(7,9,14,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
-  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; gap: 0; }
-  .tab-btn { background: none; border: none; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 16px 24px; cursor: pointer; position: relative; transition: color 0.2s; }
-  .tab-btn::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--gold); transform: scaleX(0); transition: transform 0.2s; }
-  .tab-btn.active { color: var(--gold); }
-  .tab-btn.active::after { transform: scaleX(1); }
-  .tab-btn:hover { color: var(--text); }
-  main { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem; }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
-  .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2.5rem; animation: fadeUp 0.5s ease both; }
-  .stat-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1rem; text-align: center; position: relative; overflow: hidden; transition: border-color 0.2s, transform 0.2s; }
-  .stat-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
-  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--gold); opacity: 0.6; }
-  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 42px; line-height: 1; color: var(--gold); letter-spacing: 1px; }
-  .stat-label { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
-  .stat-card.win .stat-num { color: var(--win); } .stat-card.win::before { background: var(--win); }
-  .stat-card.draw .stat-num { color: var(--draw); } .stat-card.draw::before { background: var(--draw); }
-  .stat-card.loss .stat-num { color: var(--loss); } .stat-card.loss::before { background: var(--loss); }
-  .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
-  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: var(--text); }
-  .section-line { flex: 1; height: 1px; background: var(--border); }
-  .section-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
-  .matches-table { width: 100%; border-collapse: collapse; animation: fadeUp 0.5s ease 0.1s both; }
-  .matches-table th { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; text-align: left; padding: 10px 16px; border-bottom: 1px solid var(--border); font-weight: 500; }
-  .matches-table td { padding: 14px 16px; border-bottom: 1px solid rgba(240,180,41,0.06); font-size: 13.5px; vertical-align: middle; }
-  .matches-table tr:last-child td { border-bottom: none; }
-  .match-row { background: var(--bg3); transition: background 0.15s; cursor: pointer; }
-  .match-row:hover { background: var(--bg4); }
-  .result-pill { display: inline-block; width: 28px; text-align: center; padding: 3px 0; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 1px; }
-  .result-pill.V { background: rgba(39,174,96,0.2); color: var(--win); }
-  .result-pill.E { background: rgba(243,156,18,0.2); color: var(--draw); }
-  .result-pill.D { background: rgba(192,57,43,0.2); color: var(--loss); }
-  .score-badge { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--text); }
-  .rival-name { font-weight: 500; color: var(--text); }
-  .rival-name small { display: block; font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 1px; }
-  .video-link { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--gold); text-decoration: none; background: var(--gold-glow); border: 1px solid var(--border-bright); padding: 5px 12px; border-radius: 4px; transition: background 0.2s, border-color 0.2s; font-weight: 500; letter-spacing: 0.5px; }
-  .video-link:hover { background: rgba(240,180,41,0.25); border-color: var(--gold); }
-  .video-link svg { width: 12px; height: 12px; }
-  .no-video { font-size: 11px; color: var(--muted); }
-  .perf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; animation: fadeUp 0.5s ease both; }
-  .perf-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
-  .perf-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 3px; color: var(--muted2); margin-bottom: 1.25rem; }
-  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-  .bar-label { font-size: 12px; color: var(--muted2); width: 130px; flex-shrink: 0; }
-  .bar-track { flex: 1; height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); transition: width 1s cubic-bezier(0.4,0,0.2,1); }
-  .bar-val { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold); width: 36px; text-align: right; flex-shrink: 0; }
-  .player-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-  .player-row:last-child { border-bottom: none; }
-  .player-num { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--gold); width: 24px; text-align: center; flex-shrink: 0; }
-  .player-info { flex: 1; }
-  .player-name { font-size: 13.5px; font-weight: 500; }
-  .player-pos { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
-  .player-stat { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--gold); font-weight: 600; }
-  .videos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; animation: fadeUp 0.5s ease both; }
-  .video-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color 0.2s, transform 0.2s; cursor: pointer; }
-  .video-card:hover { border-color: var(--border-bright); transform: translateY(-3px); }
-  .video-thumb { aspect-ratio: 16/9; background: var(--bg2); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-  .video-thumb::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(240,180,41,0.08) 0%, transparent 60%); }
-  .play-icon { width: 44px; height: 44px; background: rgba(240,180,41,0.15); border: 2px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.2s; }
-  .video-card:hover .play-icon { background: rgba(240,180,41,0.3); transform: scale(1.1); }
-  .play-icon svg { width: 18px; height: 18px; margin-left: 2px; }
-  .video-type-tag { position: absolute; top: 10px; left: 10px; font-size: 9px; letter-spacing: 2px; color: var(--gold); background: rgba(7,9,14,0.85); border: 1px solid var(--border-bright); padding: 3px 8px; border-radius: 3px; text-transform: uppercase; }
-  .video-info { padding: 1rem; }
-  .video-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
-  .video-meta { font-size: 11px; color: var(--muted); }
-  .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; animation: fadeUp 0.5s ease both; }
-  .form-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 1.75rem; }
-  .form-title { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; color: var(--gold); margin-bottom: 1.5rem; }
-  .form-group { margin-bottom: 1rem; }
-  label { display: block; font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
-  input, select, textarea { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13.5px; padding: 10px 14px; outline: none; transition: border-color 0.2s; }
-  input:focus, select:focus, textarea:focus { border-color: var(--gold); }
-  select option { background: var(--bg2); }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .btn-submit { width: 100%; background: var(--gold); color: var(--bg); border: none; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 12px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s, transform 0.1s; }
-  .btn-submit:hover { background: #D4A020; transform: translateY(-1px); }
-  .btn-submit:active { transform: translateY(0); }
-  .comp-tag { font-size: 10px; padding: 2px 8px; border-radius: 3px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
-  .comp-tag.liga { background: rgba(39,174,96,0.15); color: #27AE60; }
-  .comp-tag.copa { background: rgba(52,152,219,0.15); color: #3498DB; }
-  .comp-tag.amistoso { background: rgba(90,106,138,0.2); color: var(--muted2); }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(3, 1fr); } .perf-grid { grid-template-columns: 1fr; } .videos-grid { grid-template-columns: 1fr 1fr; } .admin-grid { grid-template-columns: 1fr; } .header-meta { display: none; } .tab-btn { padding: 14px 14px; font-size: 10px; letter-spacing: 1px; } }
-</style>
-</head>
-<body>
-<header>
-  <div class="header-inner">
-    <div class="logo-group">
-      <div class="club-badge">AFC</div>
-      <div class="logo-text">
-        <div class="logo-title">Aragua FC · Sub-19</div>
-        <div class="logo-sub">Portal de Rendimiento</div>
-      </div>
-    </div>
-    <div class="header-meta">
-      <span class="season-badge">TEMPORADA 2025</span>
-      <span class="analyst-tag">Armando Uban · Analista de Rendimiento</span>
-    </div>
-  </div>
-</header>
-<nav class="nav-tabs">
-  <div class="nav-inner">
-    <button class="tab-btn active" onclick="switchTab('overview')">Resumen</button>
-    <button class="tab-btn" onclick="switchTab('matches')">Partidos</button>
-    <button class="tab-btn" onclick="switchTab('rendimiento')">Rendimiento</button>
-    <button class="tab-btn" onclick="switchTab('videos')">Videos</button>
-    <button class="tab-btn" onclick="switchTab('admin')">+ Agregar</button>
-  </div>
-</nav>
-<main>
-  <div id="tab-overview" class="tab-panel active">
-    <div class="stats-row" id="stats-row"></div>
-    <div class="section-header"><span class="section-title">Últimos Resultados</span><div class="section-line"></div><span class="section-count" id="recent-count"></span></div>
-    <table class="matches-table"><thead><tr><th>Resultado</th><th>Rival</th><th>Marcador</th><th>Competencia</th><th>Fecha</th><th>Video</th></tr></thead><tbody id="recent-matches-tbody"></tbody></table>
-  </div>
-  <div id="tab-matches" class="tab-panel">
-    <div class="section-header"><span class="section-title">Todos los Partidos</span><div class="section-line"></div><span class="section-count" id="all-count"></span></div>
-    <table class="matches-table"><thead><tr><th>#</th><th>Resultado</th><th>Rival</th><th>Marcador</th><th>Competencia</th><th>Jornada</th><th>Fecha</th><th>Notas</th><th>Video</th></tr></thead><tbody id="all-matches-tbody"></tbody></table>
-  </div>
-  <div id="tab-rendimiento" class="tab-panel">
-    <div class="perf-grid">
-      <div class="perf-card"><div class="perf-card-title">Métricas de Equipo</div><div id="team-bars"></div></div>
-      <div class="perf-card"><div class="perf-card-title">Goleadores</div><div id="scorers-list"></div></div>
-      <div class="perf-card"><div class="perf-card-title">Fases de Juego</div><div id="phase-bars"></div></div>
-      <div class="perf-card"><div class="perf-card-title">Asistencias</div><div id="assists-list"></div></div>
-    </div>
-  </div>
-  <div id="tab-videos" class="tab-panel">
-    <div class="section-header"><span class="section-title">Análisis en Video</span><div class="section-line"></div><span class="section-count" id="video-count"></span></div>
-    <div class="videos-grid" id="videos-grid"></div>
-  </div>
-  <div id="tab-admin" class="tab-panel">
-    <div class="admin-grid">
-      <div class="form-card">
-        <div class="form-title">Registrar Partido</div>
-        <div class="form-row"><div class="form-group"><label>Rival</label><input id="f-rival" type="text" placeholder="Nombre del equipo"></div><div class="form-group"><label>Fecha</label><input id="f-fecha" type="date"></div></div>
-        <div class="form-row"><div class="form-group"><label>Goles Aragua</label><input id="f-ga" type="number" min="0" placeholder="0"></div><div class="form-group"><label>Goles Rival</label><input id="f-gr" type="number" min="0" placeholder="0"></div></div>
-        <div class="form-row"><div class="form-group"><label>Competencia</label><select id="f-comp"><option value="liga">Liga</option><option value="copa">Copa</option><option value="amistoso">Amistoso</option></select></div><div class="form-group"><label>Jornada / Fase</label><input id="f-jornada" type="text" placeholder="J1, Cuartos..."></div></div>
-        <div class="form-group"><label>Link de Video</label><input id="f-video" type="url" placeholder="https://..."></div>
-        <div class="form-group"><label>Tipo de Video</label><select id="f-vtipo"><option value="Análisis">Análisis Táctico</option><option value="Highlights">Highlights</option><option value="Set Pieces">Balón Parado</option><option value="Presión">Presión Alta</option></select></div>
-        <div class="form-group"><label>Notas del Analista</label><textarea id="f-notas" rows="2" placeholder="Observaciones clave..."></textarea></div>
-        <button class="btn-submit" onclick="addMatch()">Registrar Partido</button>
-      </div>
-      <div class="form-card">
-        <div class="form-title">Actualizar Rendimiento</div>
-        <div class="form-group"><label>Jugador</label><input id="p-nombre" type="text" placeholder="Nombre del jugador"></div>
-        <div class="form-row"><div class="form-group"><label>Posición</label><select id="p-pos"><option value="POR">Portero</option><option value="DEF">Defensa</option><option value="MED">Mediocampista</option><option value="DEL">Delantero</option></select></div><div class="form-group"><label>Goles</label><input id="p-goles" type="number" min="0" placeholder="0"></div></div>
-        <div class="form-group"><label>Asistencias</label><input id="p-asist" type="number" min="0" placeholder="0"></div>
-        <button class="btn-submit" onclick="addPlayer()">Guardar Jugador</button>
-        <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)">
-          <div class="form-title" style="margin-bottom:1rem;font-size:13px">Métricas de Equipo</div>
-          <div class="form-group"><label>Posesión promedio (%)</label><input id="m-posesion" type="number" min="0" max="100" placeholder="52"></div>
-          <div class="form-row"><div class="form-group"><label>Pases completados (%)</label><input id="m-pases" type="number" min="0" max="100" placeholder="78"></div><div class="form-group"><label>Duelos ganados (%)</label><input id="m-duelos" type="number" min="0" max="100" placeholder="54"></div></div>
-          <div class="form-row"><div class="form-group"><label>Tiros a puerta (%)</label><input id="m-tiros" type="number" min="0" max="100" placeholder="45"></div><div class="form-group"><label>Presión alta (%)</label><input id="m-presion" type="number" min="0" max="100" placeholder="61"></div></div>
-          <button class="btn-submit" onclick="saveMetrics()">Guardar Métricas</button>
+
+    <!-- LOADING -->
+    <div id="loading-screen">
+        <div class="loading-badge">ARAGUA FC · SUB-19</div>
+        <div class="loading-bar">
+            <div class="loading-fill"></div>
         </div>
-      </div>
+        <div class="loading-text">Cargando datos...</div>
     </div>
-  </div>
-</main>
-<script>
-function load(k,d){try{return JSON.parse(localStorage.getItem(k))||d;}catch{return d;}}
-function save(k,v){localStorage.setItem(k,JSON.stringify(v));}
-let matches=load('afc_matches',[{id:1,rival:'Caracas FC Sub-19',ga:2,gr:1,fecha:'2025-03-08',comp:'liga',jornada:'J1',video:'',vtipo:'Análisis',notas:'Dominio en zona media.'},{id:2,rival:'Metropolitanos Sub-19',ga:1,gr:1,fecha:'2025-03-15',comp:'liga',jornada:'J2',video:'https://youtube.com',vtipo:'Análisis',notas:'Partido equilibrado.'},{id:3,rival:'Carabobo FC Sub-19',ga:3,gr:0,fecha:'2025-03-22',comp:'liga',jornada:'J3',video:'https://youtube.com',vtipo:'Highlights',notas:'Gran actuación colectiva.'},{id:4,rival:'Deportivo Táchira Sub-19',ga:0,gr:2,fecha:'2025-03-29',comp:'liga',jornada:'J4',video:'',vtipo:'Análisis',notas:'Problemas en transición.'},{id:5,rival:'Zamora FC Sub-19',ga:2,gr:0,fecha:'2025-04-05',comp:'copa',jornada:'Octavos',video:'https://youtube.com',vtipo:'Set Pieces',notas:'Goles de balón parado.'}]);
-let players=load('afc_players',[{nombre:'J. Rodríguez',pos:'DEL',goles:5,asist:2},{nombre:'C. Pérez',pos:'MED',goles:3,asist:4},{nombre:'A. García',pos:'DEL',goles:3,asist:1},{nombre:'L. Martínez',pos:'MED',goles:1,asist:5},{nombre:'R. Torres',pos:'DEF',goles:1,asist:2}]);
-let metrics=load('afc_metrics',{posesion:54,pases:76,duelos:58,tiros:42,presion:63,ofensivo:68,defensivo:72,transicion:55,abp:60});
-let nextId=load('afc_nextid',6);
-function getResult(ga,gr){if(ga>gr)return'V';if(ga<gr)return'D';return'E';}
-function formatDate(d){const[y,m,day]=d.split('-');return day+'/'+ m+'/'+ y;}
-function videoBtn(url,tipo){if(!url)return'<span class="no-video">—</span>';return'<a href="'+url+'" target="_blank" class="video-link"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>'+( tipo||'Ver')+'</a>';}
-function compTag(c){const l={liga:'Liga',copa:'Copa',amistoso:'Amistoso'};return'<span class="comp-tag '+c+'">'+(l[c]||c)+'</span>';}
-function renderOverview(){const w=matches.filter(m=>m.ga>m.gr).length,dr=matches.filter(m=>m.ga===m.gr).length,l=matches.filter(m=>m.ga<m.gr).length,gf=matches.reduce((s,m)=>s+Number(m.ga),0),gc=matches.reduce((s,m)=>s+Number(m.gr),0);document.getElementById('stats-row').innerHTML='<div class="stat-card"><div class="stat-num">'+matches.length+'</div><div class="stat-label">Partidos</div></div><div class="stat-card win"><div class="stat-num">'+w+'</div><div class="stat-label">Victorias</div></div><div class="stat-card draw"><div class="stat-num">'+dr+'</div><div class="stat-label">Empates</div></div><div class="stat-card loss"><div class="stat-num">'+l+'</div><div class="stat-label">Derrotas</div></div><div class="stat-card"><div class="stat-num">'+gf+'<span style="color:var(--muted);font-size:22px">/'+ gc+'</span></div><div class="stat-label">GF / GC</div></div>';const rec=[...matches].reverse().slice(0,5);document.getElementById('recent-count').textContent='Últimos '+rec.length;document.getElementById('recent-matches-tbody').innerHTML=rec.map(m=>{const r=getResult(m.ga,m.gr);return'<tr class="match-row"><td><span class="result-pill '+r+'">'+r+'</span></td><td><span class="rival-name">'+m.rival+'</span></td><td><span class="score-badge">'+m.ga+' — '+m.gr+'</span></td><td>'+compTag(m.comp)+'</td><td style="color:var(--muted);font-size:12px">'+formatDate(m.fecha)+'</td><td>'+videoBtn(m.video,m.vtipo)+'</td></tr>';}).join('');}
-function renderMatches(){document.getElementById('all-count').textContent=matches.length+' partidos';document.getElementById('all-matches-tbody').innerHTML=matches.map((m,i)=>{const r=getResult(m.ga,m.gr);return'<tr class="match-row"><td style="color:var(--muted);font-family:monospace;font-size:11px">'+String(i+1).padStart(2,'0')+'</td><td><span class="result-pill '+r+'">'+r+'</span></td><td><span class="rival-name">'+m.rival+'</span></td><td><span class="score-badge">'+m.ga+' — '+m.gr+'</span></td><td>'+compTag(m.comp)+'</td><td style="color:var(--muted2);font-size:12px">'+(m.jornada||'—')+'</td><td style="color:var(--muted);font-size:12px">'+formatDate(m.fecha)+'</td><td style="color:var(--muted2);font-size:12px">'+(m.notas||'—')+'</td><td>'+videoBtn(m.video,m.vtipo)+'</td></tr>';}).join('');}
-function renderRendimiento(){const br=(l,v)=>'<div class="bar-row"><span class="bar-label">'+l+'</span><div class="bar-track"><div class="bar-fill" style="width:'+v+'%"></div></div><span class="bar-val">'+v+'%</span></div>';document.getElementById('team-bars').innerHTML=br('Posesión',metrics.posesion)+br('Pases',metrics.pases)+br('Duelos',metrics.duelos)+br('Tiros',metrics.tiros)+br('Presión alta',metrics.presion);document.getElementById('phase-bars').innerHTML=br('Fase Ofensiva',metrics.ofensivo)+br('Fase Defensiva',metrics.defensivo)+br('Transición',metrics.transicion)+br('ABP',metrics.abp);const sg=[...players].sort((a,b)=>b.goles-a.goles).slice(0,5),sa=[...players].sort((a,b)=>b.asist-a.asist).slice(0,5);document.getElementById('scorers-list').innerHTML=sg.map((p,i)=>'<div class="player-row"><span class="player-num">'+(i+1)+'</span><div class="player-info"><div class="player-name">'+p.nombre+'</div><div class="player-pos">'+p.pos+'</div></div><span class="player-stat">'+p.goles+' goles</span></div>').join('');document.getElementById('assists-list').innerHTML=sa.map((p,i)=>'<div class="player-row"><span class="player-num">'+(i+1)+'</span><div class="player-info"><div class="player-name">'+p.nombre+'</div><div class="player-pos">'+p.pos+'</div></div><span class="player-stat">'+p.asist+' asist.</span></div>').join('');}
-function renderVideos(){const wv=matches.filter(m=>m.video);document.getElementById('video-count').textContent=wv.length+' videos';document.getElementById('videos-grid').innerHTML=wv.map(m=>'<a href="'+m.video+'" target="_blank" class="video-card" style="text-decoration:none;color:inherit"><div class="video-thumb"><div class="video-type-tag">'+m.vtipo+'</div><div class="play-icon"><svg viewBox="0 0 24 24" fill="var(--gold)"><path d="M8 5v14l11-7z"/></svg></div></div><div class="video-info"><div class="video-title">vs '+m.rival+'</div><div class="video-meta">'+compTag(m.comp)+' · '+formatDate(m.fecha)+'</div>'+(m.notas?'<div style="font-size:11px;color:var(--muted);margin-top:6px">'+m.notas+'</div>':'')+'</div></a>').join('');}
-function addMatch(){const rival=document.getElementById('f-rival').value.trim(),fecha=document.getElementById('f-fecha').value,ga=parseInt(document.getElementById('f-ga').value)||0,gr=parseInt(document.getElementById('f-gr').value)||0;if(!rival||!fecha){alert('Completa rival y fecha');return;}matches.push({id:nextId++,rival,fecha,ga,gr,comp:document.getElementById('f-comp').value,jornada:document.getElementById('f-jornada').value,video:document.getElementById('f-video').value,vtipo:document.getElementById('f-vtipo').value,notas:document.getElementById('f-notas').value});save('afc_matches',matches);save('afc_nextid',nextId);['f-rival','f-ga','f-gr','f-jornada','f-video','f-notas'].forEach(id=>document.getElementById(id).value='');renderAll();switchTab('matches');}
-function addPlayer(){const nombre=document.getElementById('p-nombre').value.trim();if(!nombre){alert('Ingresa el nombre');return;}const idx=players.findIndex(p=>p.nombre.toLowerCase()===nombre.toLowerCase()),player={nombre,pos:document.getElementById('p-pos').value,goles:parseInt(document.getElementById('p-goles').value)||0,asist:parseInt(document.getElementById('p-asist').value)||0};if(idx>=0)players[idx]=player;else players.push(player);save('afc_players',players);document.getElementById('p-nombre').value='';document.getElementById('p-goles').value='';document.getElementById('p-asist').value='';renderRendimiento();}
-function saveMetrics(){metrics={posesion:parseInt(document.getElementById('m-posesion').value)||metrics.posesion,pases:parseInt(document.getElementById('m-pases').value)||metrics.pases,duelos:parseInt(document.getElementById('m-duelos').value)||metrics.duelos,tiros:parseInt(document.getElementById('m-tiros').value)||metrics.tiros,presion:parseInt(document.getElementById('m-presion').value)||metrics.presion,ofensivo:metrics.ofensivo,defensivo:metrics.defensivo,transicion:metrics.transicion,abp:metrics.abp};save('afc_metrics',metrics);renderRendimiento();switchTab('rendimiento');}
-function switchTab(name){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');event&&event.target.classList.add('active');}
-function renderAll(){renderOverview();renderMatches();renderRendimiento();renderVideos();}
-renderAll();
-</script>
+
+    <!-- PIN MODAL -->
+    <div class="modal-overlay hide" id="pin-modal">
+        <div class="modal-box">
+            <div class="modal-title">🔐 Acceso Analista</div>
+            <div class="modal-sub">Ingresa tu PIN para editar</div>
+            <input type="password" class="pin-input" id="pin-input" maxlength="4" placeholder="····" inputmode="numeric">
+            <div class="pin-error" id="pin-error"></div>
+            <button class="btn-pin" onclick="checkPin()">Entrar</button>
+            <button class="btn-cancel-modal" onclick="closePinModal()">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- EDIT PARTIDO MODAL -->
+    <div class="modal-overlay hide" id="edit-modal">
+        <div class="modal-wide">
+            <div class="modal-section-title">✏️ Editar Partido</div>
+            <input type="hidden" id="edit-id">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Rival</label>
+                    <input id="e-rival" type="text">
+                </div>
+                <div class="form-group">
+                    <label>Fecha</label>
+                    <input id="e-fecha" type="date">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Goles Aragua</label>
+                    <input id="e-ga" type="number" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Goles Rival</label>
+                    <input id="e-gr" type="number" min="0">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Competencia</label>
+                    <select id="e-comp">
+                        <option value="liga">Liga</option>
+                        <option value="copa">Copa</option>
+                        <option value="amistoso">Amistoso</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Jornada / Fase</label>
+                    <input id="e-jornada" type="text">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Link de Video</label>
+                    <input id="e-video" type="url">
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Video</label>
+                    <select id="e-vtipo">
+                        <option value="Análisis">Análisis Táctico</option>
+                        <option value="Highlights">Highlights</option>
+                        <option value="Set Pieces">Balón Parado</option>
+                        <option value="Presión">Presión Alta</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Notas del Analista</label>
+                <textarea id="e-notas" rows="2"></textarea>
+            </div>
+            <div style="display:flex;gap:0.75rem;margin-top:0.5rem">
+                <button class="btn-submit" style="flex:1" onclick="saveEdit()">💾 Guardar Cambios</button>
+                <button class="btn-secondary" style="flex:0.4;margin-top:0.5rem" onclick="closeEditModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT VIDEO MODAL -->
+    <div class="modal-overlay hide" id="edit-video-modal">
+        <div class="modal-wide">
+            <div class="modal-section-title">✏️ Editar Video</div>
+            <input type="hidden" id="ev-id">
+            <div class="form-group">
+                <label>Título del Video</label>
+                <input id="ev-titulo" type="text">
+            </div>
+            <div class="form-group">
+                <label>Link (YouTube, Drive, etc.)</label>
+                <input id="ev-link" type="url">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <select id="ev-cat">
+                        <option value="Análisis Táctico">Análisis Táctico</option>
+                        <option value="Partido Completo">Partido Completo</option>
+                        <option value="Entrenamiento">Entrenamiento</option>
+                        <option value="Highlights">Highlights</option>
+                        <option value="Balón Parado">Balón Parado</option>
+                        <option value="Presión Alta">Presión Alta</option>
+                        <option value="Individual">Análisis Individual</option>
+                        <option value="Rival">Análisis Rival</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha</label>
+                    <input id="ev-fecha" type="date">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="ev-desc" rows="3" placeholder="Descripción del video..."></textarea>
+            </div>
+            <div style="display:flex;gap:0.75rem;margin-top:0.5rem">
+                <button class="btn-submit" style="flex:1" onclick="saveVideoEdit()">💾 Guardar Cambios</button>
+                <button class="btn-secondary" style="flex:0.4;margin-top:0.5rem" onclick="closeVideoEditModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIRM DELETE -->
+    <div class="modal-overlay hide" id="confirm-modal">
+        <div class="confirm-box">
+            <div class="confirm-title">⚠️ Confirmar</div>
+            <div class="confirm-sub" id="confirm-text"></div>
+            <input type="hidden" id="confirm-id">
+            <input type="hidden" id="confirm-type">
+            <div class="confirm-btns">
+                <button class="btn-secondary" onclick="closeConfirmModal()">Cancelar</button>
+                <button class="btn-danger" onclick="confirmDelete()">Borrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-inner">
+            <div class="logo-group">
+                <div class="club-badge">AFC</div>
+                <div>
+                    <div class="logo-title">Aragua FC · Sub-19</div>
+                    <div class="logo-sub">Portal de Rendimiento</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div id="sync-indicator">
+                    <div class="sync-dot"></div>
+                    <span id="sync-text">CONECTANDO</span>
+                </div>
+                <span class="season-badge">TEMPORADA 2025</span>
+                <span class="analyst-tag">Armando Uban · Analista</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAV -->
+    <nav class="nav-tabs">
+        <div class="nav-inner">
+            <button class="tab-btn active" onclick="switchTab('overview',this)">Resumen</button>
+            <button class="tab-btn" onclick="switchTab('matches',this)">Partidos</button>
+            <button class="tab-btn" onclick="switchTab('videos',this)">Videos</button>
+            <button class="tab-btn" id="admin-tab-btn" onclick="handleAdminClick(this)">🔐 Analista</button>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main>
+
+        <!-- RESUMEN -->
+        <div id="tab-overview" class="tab-panel active">
+            <div class="stats-row" id="stats-row">
+                <div class="stat-card">
+                    <div class="stat-num">—</div>
+                    <div class="stat-label">Partidos</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PARTIDOS -->
+        <div id="tab-matches" class="tab-panel">
+            <div class="section-header">
+                <span class="section-title">Todos los Partidos</span>
+                <div class="section-line"></div>
+                <span class="section-count" id="all-count"></span>
+            </div>
+            <table class="matches-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Res.</th>
+                        <th>Rival</th>
+                        <th>Marcador</th>
+                        <th>Comp.</th>
+                        <th>Jornada</th>
+                        <th>Fecha</th>
+                        <th>Notas</th>
+                        <th>Video</th>
+                    </tr>
+                </thead>
+                <tbody id="all-tbody"></tbody>
+            </table>
+        </div>
+
+        <!-- VIDEOS -->
+        <div id="tab-videos" class="tab-panel">
+            <div class="section-header">
+                <span class="section-title">Biblioteca de Videos</span>
+                <div class="section-line"></div>
+                <span class="section-count" id="video-count"></span>
+            </div>
+            <!-- Filtro por categoría -->
+            <div class="cat-tabs" id="cat-tabs">
+                <button class="cat-tab active" onclick="filterVideos('all',this)">Todos</button>
+                <button class="cat-tab" onclick="filterVideos('Análisis Táctico',this)">Análisis Táctico</button>
+                <button class="cat-tab" onclick="filterVideos('Partido Completo',this)">Partido Completo</button>
+                <button class="cat-tab" onclick="filterVideos('Entrenamiento',this)">Entrenamiento</button>
+                <button class="cat-tab" onclick="filterVideos('Highlights',this)">Highlights</button>
+                <button class="cat-tab" onclick="filterVideos('Balón Parado',this)">Balón Parado</button>
+                <button class="cat-tab" onclick="filterVideos('Individual',this)">Individual</button>
+                <button class="cat-tab" onclick="filterVideos('Rival',this)">Análisis Rival</button>
+            </div>
+            <div class="videos-grid" id="videos-grid"></div>
+        </div>
+
+        <!-- ANALISTA -->
+        <div id="tab-admin" class="tab-panel">
+
+            <!-- REGISTRAR PARTIDO -->
+            <div class="admin-section">
+                <div class="admin-section-title">Registrar Nuevo Partido</div>
+                <div class="form-card">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Rival</label>
+                            <input id="f-rival" type="text" placeholder="Nombre del equipo">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha</label>
+                            <input id="f-fecha" type="date">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Goles Aragua</label>
+                            <input id="f-ga" type="number" min="0" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Goles Rival</label>
+                            <input id="f-gr" type="number" min="0" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Competencia</label>
+                            <select id="f-comp">
+                                <option value="liga">Liga</option>
+                                <option value="copa">Copa</option>
+                                <option value="amistoso">Amistoso</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Jornada / Fase</label>
+                            <input id="f-jornada" type="text" placeholder="J1, Cuartos...">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Link de Video del Partido</label>
+                            <input id="f-video" type="url" placeholder="https://...">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Video</label>
+                            <select id="f-vtipo">
+                                <option value="Análisis">Análisis Táctico</option>
+                                <option value="Highlights">Highlights</option>
+                                <option value="Set Pieces">Balón Parado</option>
+                                <option value="Presión">Presión Alta</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notas del Analista</label>
+                        <textarea id="f-notas" rows="2" placeholder="Observaciones clave..."></textarea>
+                    </div>
+                    <button class="btn-submit" id="btn-add-match" onclick="addMatch()">+ Registrar Partido</button>
+                </div>
+            </div>
+
+            <!-- SUBIR VIDEO INDEPENDIENTE -->
+            <div class="admin-section">
+                <div class="admin-section-title">Subir Video Independiente</div>
+                <div class="form-card">
+                    <div class="form-group">
+                        <label>Título del Video</label>
+                        <input id="v-titulo" type="text" placeholder="Ej: Análisis presión alta vs Caracas FC">
+                    </div>
+                    <div class="form-group">
+                        <label>Link (YouTube, Drive, Vimeo, etc.)</label>
+                        <input id="v-link" type="url" placeholder="https://...">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Categoría</label>
+                            <select id="v-cat">
+                                <option value="Análisis Táctico">Análisis Táctico</option>
+                                <option value="Partido Completo">Partido Completo</option>
+                                <option value="Entrenamiento">Entrenamiento</option>
+                                <option value="Highlights">Highlights</option>
+                                <option value="Balón Parado">Balón Parado</option>
+                                <option value="Presión Alta">Presión Alta</option>
+                                <option value="Individual">Análisis Individual</option>
+                                <option value="Rival">Análisis Rival</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha</label>
+                            <input id="v-fecha" type="date">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <textarea id="v-desc" rows="2" placeholder="Breve descripción del contenido del video..."></textarea>
+                    </div>
+                    <button class="btn-submit" id="btn-add-video" onclick="addVideo()">▶ Subir Video</button>
+                </div>
+            </div>
+
+            <!-- GESTIONAR PARTIDOS -->
+            <div class="admin-section">
+                <div class="admin-section-title">Gestionar Partidos Registrados</div>
+                <table class="manage-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Rival</th>
+                            <th>Marcador</th>
+                            <th>Comp.</th>
+                            <th>Video</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="manage-tbody"></tbody>
+                </table>
+            </div>
+
+            <!-- GESTIONAR VIDEOS -->
+            <div class="admin-section">
+                <div class="admin-section-title">Gestionar Videos Subidos</div>
+                <table class="manage-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Título</th>
+                            <th>Categoría</th>
+                            <th>Link</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="manage-videos-tbody"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC3qThe7VZlVeMO_P0jV1PcQ5j4ZG_AUcU",
+        authDomain: "au-ar-aragua-sub-19.firebaseapp.com",
+        projectId: "au-ar-aragua-sub-19",
+        storageBucket: "au-ar-aragua-sub-19.firebasestorage.app",
+        messagingSenderId: "576436448748",
+        appId: "1:576436448748:web:16744c40736382f13b24c9"
+    };
+    const app = initializeApp(firebaseConfig),
+        db = getFirestore(app);
+    const ADMIN_PIN = '2121';
+    let isAdmin = false,
+        matches = [],
+        videos = [],
+        currentFilter = 'all',
+        loadedCount = 0;
+
+    // ── HELPERS ─────────────────────────────────────────────
+    function getResult(ga, gr) {
+        return +ga > +gr ? 'V' : +ga < +gr ? 'D' : 'E';
+    }
+    function formatDate(d) {
+        if (!d)
+            return '—';
+        const [y, m, day] = d.split('-');
+        return `${day}/${m}/${y}`;
+    }
+    function videoBtn(url, tipo) {
+        if (!url)
+            return '<span class="no-video">—</span>';
+        return `<a href="${url}" target="_blank" class="video-link"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>${tipo || 'Ver'}</a>`;
+    }
+    function compTag(c) {
+        const l = {
+            liga: 'Liga',
+            copa: 'Copa',
+            amistoso: 'Amistoso'
+        };
+        return `<span class="comp-tag ${c}">${l[c] || c}</span>`;
+    }
+    function showToast(msg, type='success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = `show ${type}`;
+        setTimeout(() => t.className = '', 3000);
+    }
+    function setSyncStatus(s) {
+        const el = document.getElementById('sync-indicator'),
+            txt = document.getElementById('sync-text');
+        el.className = s;
+        txt.textContent = s === 'live' ? '● EN VIVO' : s === 'offline' ? 'SIN CONEXIÓN' : 'CONECTANDO';
+    }
+    function checkLoaded() {
+        loadedCount++;
+        if (loadedCount >= 2)
+            setTimeout(() => document.getElementById('loading-screen').classList.add('hide'), 800);
+    }
+
+    // ── RENDER ───────────────────────────────────────────────
+    function renderOverview() {
+        const w = matches.filter(m => +m.ga > +m.gr).length,
+            dr = matches.filter(m => +m.ga === +m.gr).length,
+            l = matches.filter(m => +m.ga < +m.gr).length;
+        const gf = matches.reduce((s, m) => s + (+m.ga), 0),
+            gc = matches.reduce((s, m) => s + (+m.gr), 0);
+        document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${matches.length}</div><div class="stat-label">Partidos</div></div>
+    <div class="stat-card win"><div class="stat-num">${w}</div><div class="stat-label">Victorias</div></div>
+    <div class="stat-card draw"><div class="stat-num">${dr}</div><div class="stat-label">Empates</div></div>
+    <div class="stat-card loss"><div class="stat-num">${l}</div><div class="stat-label">Derrotas</div></div>
+    <div class="stat-card"><div class="stat-num">${gf}<span style="color:var(--muted);font-size:22px">/${gc}</span></div><div class="stat-label">GF / GC</div></div>`;
+    }
+
+    function renderMatches() {
+        const s = [...matches].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+        document.getElementById('all-count').textContent = `${s.length} partidos`;
+        document.getElementById('all-tbody').innerHTML = s.length === 0
+        ? `<tr><td colspan="9" class="empty-state">Sin partidos registrados aún</td></tr>`
+        : s.map((m, i) => {
+            const r = getResult(m.ga, m.gr);
+            return `<tr class="match-row">
+      <td style="color:var(--muted);font-family:monospace;font-size:11px">${String(i + 1).padStart(2, '0')}</td>
+      <td><span class="result-pill ${r}">${r}</span></td>
+      <td><span class="rival-name">${m.rival}</span></td>
+      <td><span class="score-badge">${m.ga} — ${m.gr}</span></td>
+      <td>${compTag(m.comp)}</td>
+      <td style="color:var(--muted2);font-size:12px">${m.jornada || '—'}</td>
+      <td style="color:var(--muted);font-size:12px">${formatDate(m.fecha)}</td>
+      <td style="color:var(--muted2);font-size:12px;max-width:160px">${m.notas || '—'}</td>
+      <td>${videoBtn(m.video, m.vtipo)}</td>
+    </tr>`
+            ;
+        }).join('');
+    }
+
+    function renderVideos(filter) {
+        const all = videos;
+        const filtered = filter && filter !== 'all' ? all.filter(v => v.cat === filter) : all;
+        const sorted = [...filtered].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+        document.getElementById('video-count').textContent = `${sorted.length} videos`;
+        document.getElementById('videos-grid').innerHTML = sorted.length === 0
+        ? `<div class="empty-state" style="grid-column:1/-1">No hay videos en esta categoría aún</div>`
+        : sorted.map(v => `
+      <a href="${v.link}" target="_blank" class="video-card">
+        <div class="video-thumb">
+          <div class="video-cat-tag">${
+        v.cat || 'Video'}</div>
+          <div class="play-icon"><svg viewBox="0 0 24 24" fill="var(--gold)"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">${
+
+
+        v.titulo}</div>
+          ${v.desc ? `<div class="video-desc">${v.desc}</div>` : ''}
+          <div class="video-meta">${formatDate(v.fecha)}</div>
+        </div>
+      </a>`
+
+        ).join('');
+    }
+
+    function renderManageMatches() {
+        const s = [...matches].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+        document.getElementById('manage-tbody').innerHTML = s.length === 0
+        ? `<tr><td colspan="6" class="empty-state">Sin partidos registrados</td></tr>`
+        : s.map(m => {
+            const r = getResult(m.ga, m.gr);
+            return `<tr class="manage-row">
+      <td style="color:var(--muted);font-size:12px">${formatDate(m.fecha)}</td>
+      <td><strong>${m.rival}</strong></td>
+      <td><span class="result-pill ${r}" style="margin-right:6px">${r}</span><span class="score-badge" style="font-size:15px">${m.ga}–${m.gr}</span></td>
+      <td>${compTag(m.comp)}</td>
+      <td>${m.video ? `<a href="${m.video}" target="_blank" style="color:var(--gold);font-size:11px">▶ Ver</a>` : '<span style="color:var(--muted);font-size:11px">—</span>'}</td>
+      <td><div class="action-btns">
+        <button class="btn-edit" onclick="openEdit('${
+            m.id}')">✏️ Editar</button>
+        <button class="btn-delete" onclick="openDelete('${m.id}','partido','${m.rival.replace(/'/g, '')}')">🗑️ Borrar</button>
+      </div></td>
+    </tr>`
+
+            ;
+        }).join('');
+    }
+
+    function renderManageVideos() {
+        const s = [...videos].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+        document.getElementById('manage-videos-tbody').innerHTML = s.length === 0
+        ? `<tr><td colspan="5" class="empty-state">Sin videos subidos</td></tr>`
+        : s.map(v => `<tr class="manage-row">
+      <td style="color:var(--muted);font-size:12px">${formatDate(v.fecha)}</td>
+      <td style="max-width:200px"><strong>${v.titulo}</strong>${v.desc ? `<div style="font-size:11px;color:var(--muted);margin-top:2px">${v.desc.substring(0, 60)}${v.desc.length > 60 ? '...' : ''}</div>` : ''}</td>
+      <td><span class="cat-tab active" style="cursor:default;font-size:9px;padding:3px 8px">${v.cat || '—'}</span></td>
+      <td><a href="${v.link}" target="_blank" style="color:var(--gold);font-size:11px">▶ Ver</a></td>
+      <td><div class="action-btns">
+        <button class="btn-edit" onclick="openVideoEdit('${
+        v.id}')">✏️ Editar</button>
+        <button class="btn-delete" onclick="openDelete('${v.id}','video','${v.titulo.replace(/'/g, '')}')">🗑️ Borrar</button>
+      </div></td>
+    </tr>`
+
+        ).join('');
+    }
+
+    function renderAll() {
+        renderOverview();
+        renderMatches();
+        renderVideos(currentFilter);
+        if (isAdmin) {
+            renderManageMatches();
+            renderManageVideos();
+        }
+    }
+
+    // ── FIRESTORE LISTENERS ──────────────────────────────────
+    onSnapshot(collection(db, 'partidos'), snap => {
+        matches = snap.docs.map(d => ({
+            id: d.id,
+            ...d.data()
+        }));
+        renderOverview();
+        renderMatches();
+        if (isAdmin)
+            renderManageMatches();
+        setSyncStatus('live');
+        checkLoaded();
+    }, () => {
+        setSyncStatus('offline');
+        checkLoaded();
+    });
+
+    onSnapshot(collection(db, 'videos'), snap => {
+        videos = snap.docs.map(d => ({
+            id: d.id,
+            ...d.data()
+        }));
+        renderVideos(currentFilter);
+        if (isAdmin)
+            renderManageVideos();
+        checkLoaded();
+    }, () => {
+        checkLoaded();
+    });
+
+    // ── FILTRO VIDEOS ─────────────────────────────────────────
+    window.filterVideos = function(cat, btn) {
+        currentFilter = cat;
+        document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+        if (btn)
+            btn.classList.add('active');
+        renderVideos(cat);
+    };
+
+    // ── ACCIONES PARTIDOS ─────────────────────────────────────
+    window.addMatch = async function() {
+        const rival = document.getElementById('f-rival').value.trim(),
+            fecha = document.getElementById('f-fecha').value;
+        if (!rival || !fecha) {
+            showToast('Completa rival y fecha', 'error');
+            return;
+        }
+        const btn = document.getElementById('btn-add-match');
+        btn.disabled = true;
+        btn.textContent = 'Guardando...';
+        try {
+            await addDoc(collection(db, 'partidos'), {
+                rival,
+                fecha,
+                ga: parseInt(document.getElementById('f-ga').value) || 0,
+                gr: parseInt(document.getElementById('f-gr').value) || 0,
+                comp: document.getElementById('f-comp').value,
+                jornada: document.getElementById('f-jornada').value,
+                video: document.getElementById('f-video').value,
+                vtipo: document.getElementById('f-vtipo').value,
+                notas: document.getElementById('f-notas').value,
+                createdAt: new Date().toISOString()
+            });
+            ['f-rival', 'f-ga', 'f-gr', 'f-jornada', 'f-video', 'f-notas'].forEach(id => document.getElementById(id).value = '');
+            showToast('✅ Partido guardado en la nube');
+        } catch (e) {
+            showToast('Error guardando partido', 'error');
+        }
+        btn.disabled = false;
+        btn.textContent = '+ Registrar Partido';
+    };
+
+    window.openEdit = function(id) {
+        const m = matches.find(x => x.id === id);
+        if (!m)
+            return;
+        document.getElementById('edit-id').value = id;
+        document.getElementById('e-rival').value = m.rival || '';
+        document.getElementById('e-fecha').value = m.fecha || '';
+        document.getElementById('e-ga').value = m.ga ?? 0;
+        document.getElementById('e-gr').value = m.gr ?? 0;
+        document.getElementById('e-comp').value = m.comp || 'liga';
+        document.getElementById('e-jornada').value = m.jornada || '';
+        document.getElementById('e-video').value = m.video || '';
+        document.getElementById('e-vtipo').value = m.vtipo || 'Análisis';
+        document.getElementById('e-notas').value = m.notas || '';
+        document.getElementById('edit-modal').classList.remove('hide');
+    };
+
+    window.saveEdit = async function() {
+        const id = document.getElementById('edit-id').value,
+            rival = document.getElementById('e-rival').value.trim(),
+            fecha = document.getElementById('e-fecha').value;
+        if (!rival || !fecha) {
+            showToast('Completa rival y fecha', 'error');
+            return;
+        }
+        try {
+            await updateDoc(doc(db, 'partidos', id), {
+                rival,
+                fecha,
+                ga: parseInt(document.getElementById('e-ga').value) || 0,
+                gr: parseInt(document.getElementById('e-gr').value) || 0,
+                comp: document.getElementById('e-comp').value,
+                jornada: document.getElementById('e-jornada').value,
+                video: document.getElementById('e-video').value,
+                vtipo: document.getElementById('e-vtipo').value,
+                notas: document.getElementById('e-notas').value,
+                updatedAt: new Date().toISOString()
+            });
+            closeEditModal();
+            showToast('✅ Partido actualizado');
+        } catch (e) {
+            showToast('Error actualizando partido', 'error');
+        }
+    };
+
+    window.closeEditModal = function() {
+        document.getElementById('edit-modal').classList.add('hide');
+    };
+
+    // ── ACCIONES VIDEOS ───────────────────────────────────────
+    window.addVideo = async function() {
+        const titulo = document.getElementById('v-titulo').value.trim(),
+            link = document.getElementById('v-link').value.trim();
+        if (!titulo || !link) {
+            showToast('Completa título y link', 'error');
+            return;
+        }
+        const btn = document.getElementById('btn-add-video');
+        btn.disabled = true;
+        btn.textContent = 'Subiendo...';
+        try {
+            await addDoc(collection(db, 'videos'), {
+                titulo,
+                link,
+                cat: document.getElementById('v-cat').value,
+                fecha: document.getElementById('v-fecha').value,
+                desc: document.getElementById('v-desc').value,
+                createdAt: new Date().toISOString()
+            });
+            ['v-titulo', 'v-link', 'v-fecha', 'v-desc'].forEach(id => document.getElementById(id).value = '');
+            showToast('✅ Video guardado en la nube');
+            switchTab('videos', document.querySelector('.tab-btn:nth-child(3)'));
+        } catch (e) {
+            showToast('Error guardando video', 'error');
+        }
+        btn.disabled = false;
+        btn.textContent = '▶ Subir Video';
+    };
+
+    window.openVideoEdit = function(id) {
+        const v = videos.find(x => x.id === id);
+        if (!v)
+            return;
+        document.getElementById('ev-id').value = id;
+        document.getElementById('ev-titulo').value = v.titulo || '';
+        document.getElementById('ev-link').value = v.link || '';
+        document.getElementById('ev-cat').value = v.cat || 'Análisis Táctico';
+        document.getElementById('ev-fecha').value = v.fecha || '';
+        document.getElementById('ev-desc').value = v.desc || '';
+        document.getElementById('edit-video-modal').classList.remove('hide');
+    };
+
+    window.saveVideoEdit = async function() {
+        const id = document.getElementById('ev-id').value,
+            titulo = document.getElementById('ev-titulo').value.trim(),
+            link = document.getElementById('ev-link').value.trim();
+        if (!titulo || !link) {
+            showToast('Completa título y link', 'error');
+            return;
+        }
+        try {
+            await updateDoc(doc(db, 'videos', id), {
+                titulo,
+                link,
+                cat: document.getElementById('ev-cat').value,
+                fecha: document.getElementById('ev-fecha').value,
+                desc: document.getElementById('ev-desc').value,
+                updatedAt: new Date().toISOString()
+            });
+            closeVideoEditModal();
+            showToast('✅ Video actualizado');
+        } catch (e) {
+            showToast('Error actualizando video', 'error');
+        }
+    };
+
+    window.closeVideoEditModal = function() {
+        document.getElementById('edit-video-modal').classList.add('hide');
+    };
+
+    // ── BORRAR ────────────────────────────────────────────────
+    window.openDelete = function(id, type, nombre) {
+        document.getElementById('confirm-id').value = id;
+        document.getElementById('confirm-type').value = type;
+        const label = type === 'partido' ? 'el partido vs ' + nombre : 'el video "' + nombre + '"';
+        document.getElementById('confirm-text').textContent = `¿Seguro que quieres borrar ${label}? Esta acción no se puede deshacer.`;
+        document.getElementById('confirm-modal').classList.remove('hide');
+    };
+
+    window.confirmDelete = async function() {
+        const id = document.getElementById('confirm-id').value,
+            type = document.getElementById('confirm-type').value;
+        try {
+            await deleteDoc(doc(db, type === 'partido' ? 'partidos' : 'videos', id));
+            closeConfirmModal();
+            showToast(type === 'partido' ? '🗑️ Partido eliminado' : '🗑️ Video eliminado');
+        } catch (e) {
+            showToast('Error eliminando', 'error');
+        }
+    };
+
+    window.closeConfirmModal = function() {
+        document.getElementById('confirm-modal').classList.add('hide');
+    };
+
+    // ── PIN & TABS ────────────────────────────────────────────
+    window.handleAdminClick = function(btn) {
+        if (isAdmin) {
+            switchTab('admin', btn);
+        }
+        else {
+            document.getElementById('pin-modal').classList.remove('hide');
+            document.getElementById('pin-input').focus();
+        }
+    };
+
+    window.checkPin = function() {
+        const val = document.getElementById('pin-input').value;
+        if (val === ADMIN_PIN) {
+            isAdmin = true;
+            document.getElementById('pin-modal').classList.add('hide');
+            document.getElementById('pin-input').value = '';
+            document.getElementById('pin-error').textContent = '';
+            const btn = document.getElementById('admin-tab-btn');
+            btn.classList.add('unlocked');
+            btn.textContent = '⚡ Analista';
+            renderManageMatches();
+            renderManageVideos();
+            switchTab('admin', btn);
+            showToast('✅ Acceso de analista activado');
+        } else {
+            document.getElementById('pin-error').textContent = 'PIN incorrecto';
+            document.getElementById('pin-input').value = '';
+        }
+    };
+
+    window.closePinModal = function() {
+        document.getElementById('pin-modal').classList.add('hide');
+        document.getElementById('pin-input').value = '';
+        document.getElementById('pin-error').textContent = '';
+    };
+
+    window.switchTab = function(name, btn) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        if (btn)
+            btn.classList.add('active');
+    };
+
+    document.getElementById('pin-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter')
+            window.checkPin();
+    });
+    </script>
 </body>
 </html>
