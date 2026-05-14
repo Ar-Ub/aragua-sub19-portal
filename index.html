@@ -289,95 +289,6 @@ footer{position:sticky;bottom:0;z-index:8;border-top:1px solid var(--border);bac
   <div class="ls-bar"><div class="ls-fill"></div></div>
 </div>
 
-<!-- PIN MODAL -->
-<div class="mo hide" id="pm">
-  <div class="mb">
-    <div class="mt">Acceso Analista</div>
-    <div class="ms">Ingresa tu PIN</div>
-    <div class="pdots">
-      <div class="pd" id="d0"></div><div class="pd" id="d1"></div>
-      <div class="pd" id="d2"></div><div class="pd" id="d3"></div>
-    </div>
-    <div class="pkp">
-      <button class="pk" onclick="pK('1')">1</button>
-      <button class="pk" onclick="pK('2')">2</button>
-      <button class="pk" onclick="pK('3')">3</button>
-      <button class="pk" onclick="pK('4')">4</button>
-      <button class="pk" onclick="pK('5')">5</button>
-      <button class="pk" onclick="pK('6')">6</button>
-      <button class="pk" onclick="pK('7')">7</button>
-      <button class="pk" onclick="pK('8')">8</button>
-      <button class="pk" onclick="pK('9')">9</button>
-      <button class="pk del" onclick="pDel()">⌫</button>
-      <button class="pk z0" onclick="pK('0')">0</button>
-    </div>
-    <div class="pe" id="pe"></div>
-    <button class="bcm" onclick="cPm()">Cancelar</button>
-  </div>
-</div>
-
-<!-- EDIT PARTIDO MODAL -->
-<div class="mo hide" id="em">
-  <div class="mw">
-    <div class="mst">✏️ Editar Partido</div>
-    <input type="hidden" id="ei">
-    <div class="fr"><div class="fg"><label>Rival</label><input id="er" type="text"></div><div class="fg"><label>Fecha</label><input id="ef" type="date"></div></div>
-    <div class="fr"><div class="fg"><label>Goles Aragua</label><input id="eg" type="number" min="0" inputmode="numeric"></div><div class="fg"><label>Goles Rival</label><input id="egr" type="number" min="0" inputmode="numeric"></div></div>
-    <div class="fr">
-      <div class="fg"><label>Competencia</label><select id="ec"><option value="liga">Liga</option><option value="copa">Copa</option><option value="amistoso">Amistoso</option></select></div>
-      <div class="fg"><label>Jornada</label><input id="ej" type="text"></div>
-    </div>
-    <div class="fr">
-      <div class="fg"><label>Link Video</label><input id="ev" type="url" inputmode="url"></div>
-      <div class="fg"><label>Tipo</label><select id="et"><option value="Análisis">Análisis</option><option value="Highlights">Highlights</option><option value="Set Pieces">Balón Parado</option><option value="Presión">Presión Alta</option></select></div>
-    </div>
-    <div class="fg"><label>Notas</label><textarea id="en" rows="2"></textarea></div>
-    <div style="display:flex;gap:0.75rem;margin-top:0.5rem">
-      <button class="bs" style="flex:1" onclick="sEd()">Guardar Cambios</button>
-      <button class="bsc" style="flex:0.4;border-radius:6px;cursor:pointer;" onclick="cEm()">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- EDIT VIDEO MODAL -->
-<div class="mo hide" id="evm">
-  <div class="mw">
-    <div class="mst">✏️ Editar Video</div>
-    <input type="hidden" id="evi">
-    <div class="fg"><label>Título</label><input id="evt" type="text"></div>
-    <div class="fg"><label>Link</label><input id="evl" type="url" inputmode="url"></div>
-    <div class="fr">
-      <div class="fg"><label>Categoría</label>
-        <select id="evc">
-          <option value="Análisis Táctico">Análisis Táctico</option><option value="Partido Completo">Partido Completo</option>
-          <option value="Entrenamiento">Entrenamiento</option><option value="Highlights">Highlights</option>
-          <option value="Balón Parado">Balón Parado</option><option value="Presión Alta">Presión Alta</option>
-          <option value="Individual">Análisis Individual</option><option value="Rival">Análisis Rival</option>
-        </select>
-      </div>
-      <div class="fg"><label>Fecha</label><input id="evf" type="date"></div>
-    </div>
-    <div class="fg"><label>Descripción</label><textarea id="evd" rows="2"></textarea></div>
-    <div style="display:flex;gap:0.75rem;margin-top:0.5rem">
-      <button class="bs" style="flex:1" onclick="sVEd()">Guardar Cambios</button>
-      <button class="bsc" style="flex:0.4;border-radius:6px;cursor:pointer;" onclick="cEvm()">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- CONFIRM -->
-<div class="mo hide" id="cfm">
-  <div class="cb">
-    <div class="ct">⚠️ Confirmar</div>
-    <div class="cs" id="cft"></div>
-    <input type="hidden" id="cfi"><input type="hidden" id="cftp">
-    <div class="cbs">
-      <button class="bsc" onclick="cCfm()">Cancelar</button>
-      <button class="bdg" onclick="cDel()">Borrar</button>
-    </div>
-  </div>
-</div>
-
 <div id="toast"></div>
 
 <!-- HEADER -->
@@ -401,7 +312,6 @@ footer{position:sticky;bottom:0;z-index:8;border-top:1px solid var(--border);bac
     <div class="hr">
       <div id="si"><div class="sd"></div><span id="st">...</span></div>
       <span class="sb">2026</span>
-      <div id="ai-badge" onclick="gAdmin()">⚡ Analista</div>
     </div>
   </div>
 </header>
@@ -412,7 +322,6 @@ footer{position:sticky;bottom:0;z-index:8;border-top:1px solid var(--border);bac
     <button class="tb on" onclick="sTab('o',this)">Resumen</button>
     <button class="tb" onclick="sTab('m',this)">Partidos</button>
     <button class="tb" onclick="sTab('v',this)">Videos</button>
-    <button class="tb" id="atb" style="display:none" onclick="sTab('a',this)">Panel</button>
   </div>
 </nav>
 
@@ -452,69 +361,6 @@ footer{position:sticky;bottom:0;z-index:8;border-top:1px solid var(--border);bac
     <div class="vg" id="vg"></div>
   </div>
 
-  <!-- PANEL ANALISTA -->
-  <div id="tp-a" class="tp">
-    <div class="as">
-      <div class="ast">Registrar Partido</div>
-      <div class="fc">
-        <div class="fr"><div class="fg"><label>Rival</label><input id="fr2" type="text" placeholder="Nombre del equipo"></div><div class="fg"><label>Fecha</label><input id="ff" type="date"></div></div>
-        <div class="fr"><div class="fg"><label>Goles Aragua</label><input id="fg2" type="number" min="0" placeholder="0" inputmode="numeric"></div><div class="fg"><label>Goles Rival</label><input id="fgr" type="number" min="0" placeholder="0" inputmode="numeric"></div></div>
-        <div class="fr">
-          <div class="fg"><label>Competencia</label><select id="fc2"><option value="liga">Liga</option><option value="copa">Copa</option><option value="amistoso">Amistoso</option></select></div>
-          <div class="fg"><label>Jornada</label><input id="fj" type="text" placeholder="J1, Cuartos..."></div>
-        </div>
-        <div class="fr">
-          <div class="fg"><label>Link Video</label><input id="fv" type="url" placeholder="https://..." inputmode="url"></div>
-          <div class="fg"><label>Tipo</label><select id="fvt"><option value="Análisis">Análisis</option><option value="Highlights">Highlights</option><option value="Set Pieces">Balón Parado</option><option value="Presión">Presión Alta</option></select></div>
-        </div>
-        <div class="fg"><label>Notas</label><textarea id="fn" rows="2" placeholder="Observaciones clave..."></textarea></div>
-        <button class="bs" id="bam" onclick="aM()">+ Registrar Partido</button>
-      </div>
-    </div>
-
-    <div class="as">
-      <div class="ast">Subir Video</div>
-      <div class="fc">
-        <div class="fg"><label>Título</label><input id="vt2" type="text" placeholder="Ej: Análisis presión alta vs Caracas FC"></div>
-        <div class="fg"><label>Link (YouTube, Drive, etc.)</label><input id="vl2" type="url" placeholder="https://..." inputmode="url"></div>
-        <div class="fr">
-          <div class="fg"><label>Categoría</label>
-            <select id="vc3">
-              <option value="Análisis Táctico">Análisis Táctico</option><option value="Partido Completo">Partido Completo</option>
-              <option value="Entrenamiento">Entrenamiento</option><option value="Highlights">Highlights</option>
-              <option value="Balón Parado">Balón Parado</option><option value="Presión Alta">Presión Alta</option>
-              <option value="Individual">Análisis Individual</option><option value="Rival">Análisis Rival</option>
-            </select>
-          </div>
-          <div class="fg"><label>Fecha</label><input id="vf2" type="date"></div>
-        </div>
-        <div class="fg"><label>Descripción</label><textarea id="vd2" rows="2" placeholder="Breve descripción del video..."></textarea></div>
-        <button class="bs" id="bav" onclick="aV()">▶ Subir Video</button>
-      </div>
-    </div>
-
-    <div class="as">
-      <div class="ast">Gestionar Partidos</div>
-      <div class="tw"><table class="mtm">
-        <thead><tr><th>Fecha</th><th>Rival</th><th>Marcador</th><th>Comp.</th><th>Video</th><th>Acciones</th></tr></thead>
-        <tbody id="mtb"></tbody>
-      </table></div>
-    </div>
-
-    <div class="as">
-      <div class="ast">Gestionar Videos</div>
-      <div class="tw"><table class="mtm">
-        <thead><tr><th>Fecha</th><th>Título</th><th>Categoría</th><th>Acciones</th></tr></thead>
-        <tbody id="mvtb"></tbody>
-      </table></div>
-    </div>
-    <div class="as" id="jm-section">
-      <div class="ast">Gestionar Jornadas</div>
-      <div id="jm-list"></div>
-      <button class="bs" style="margin-top:1rem" onclick="saveAllJornadas()">💾 Guardar Todos los Cambios</button>
-    </div>
-
-  </div>
 
 </main>
 
@@ -531,74 +377,21 @@ footer{position:sticky;bottom:0;z-index:8;border-top:1px solid var(--border);bac
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,doc,addDoc,getDoc,updateDoc,deleteDoc,onSnapshot,setDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,collection,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg={apiKey:"AIzaSyC3qThe7VZlVeMO_P0jV1PcQ5j4ZG_AUcU",authDomain:"au-ar-aragua-sub-19.firebaseapp.com",projectId:"au-ar-aragua-sub-19",storageBucket:"au-ar-aragua-sub-19.firebasestorage.app",messagingSenderId:"576436448748",appId:"1:576436448748:web:16744c40736382f13b24c9"};
 const app=initializeApp(cfg),db=getFirestore(app);
+let matches=[],videos=[],vFilter='all',lded=0;
 
-let isAdmin=false,pBuf='',matches=[],videos=[],vFilter='all',lded=0,clickCount=0,clickTimer=null;
-
-async function hPin(p){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(p+'aragua_salt'));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
-async function vPin(p){try{const s=await getDoc(doc(db,'config','auth'));if(!s.exists())return false;return s.data().pinHash===(await hPin(p));}catch{return false;}}
-async function initPin(){try{const s=await getDoc(doc(db,'config','auth'));if(!s.exists())await setDoc(doc(db,'config','auth'),{pinHash:await hPin(atob('OTA4OA=='))});}catch{}}
-
-// 3 CLICKS EN LOGO
-document.getElementById('logo-click').addEventListener('click',function(){
-  if(isAdmin){window.gAdmin();return;}
-  clickCount++;
-  const dots=['lc0','lc1','lc2'];
-  document.getElementById('lc'+(clickCount-1))?.classList.add('on');
-  document.getElementById('lb').classList.add('clicking');
-  clearTimeout(clickTimer);
-  clickTimer=setTimeout(()=>{
-    clickCount=0;
-    dots.forEach(d=>document.getElementById(d)?.classList.remove('on'));
-    document.getElementById('lb').classList.remove('clicking');
-  },1500);
-  if(clickCount>=3){
-    clearTimeout(clickTimer);
-    clickCount=0;
-    dots.forEach(d=>document.getElementById(d)?.classList.remove('on'));
-    document.getElementById('lb').classList.remove('clicking');
-    document.getElementById('pm').classList.remove('hide');
-  }
-});
-
-window.pK=function(k){if(pBuf.length>=4)return;pBuf+=k;uDots();if(pBuf.length===4)setTimeout(subPin,180);};
-window.pDel=function(){pBuf=pBuf.slice(0,-1);uDots();document.getElementById('pe').textContent='';};
-function uDots(){for(let i=0;i<4;i++)document.getElementById('d'+i).classList.toggle('on',i<pBuf.length);}
-async function subPin(){
-  const ok=await vPin(pBuf);
-  if(ok){
-    isAdmin=true;
-    document.getElementById('pm').classList.add('hide');
-    pBuf='';uDots();document.getElementById('pe').textContent='';
-    document.getElementById('ai-badge').classList.add('show');
-    jmOrder=[];
-    document.getElementById('atb').style.display='';
-    rMM();rMV();rJM();
-    sTab('a',document.getElementById('atb'));
-    toast('✅ Acceso de analista activado');
-  }else{
-    document.getElementById('pe').textContent='PIN incorrecto';
-    pBuf='';uDots();
-    setTimeout(()=>document.getElementById('pe').textContent='',2000);
-  }
-}
-window.cPm=function(){document.getElementById('pm').classList.add('hide');pBuf='';uDots();document.getElementById('pe').textContent='';};
-window.gAdmin=function(){if(isAdmin)sTab('a',document.getElementById('atb'));};
-
-// HELPERS
+function getJ(j){if(!j)return 999;const n=parseInt(j.replace(/[^0-9]/g,''));return isNaN(n)?999:n;}
+function sortByJornada(arr){return[...arr].sort((a,b)=>{const d=getJ(a.jornada)-getJ(b.jornada);return d!==0?d:(a.fecha||'').localeCompare(b.fecha||'');});}
 function gR(a,b){return+a>+b?'V':+a<+b?'D':'E';}
 function fD(d){if(!d)return'—';const[y,m,day]=d.split('-');return`${day}/${m}/${y}`;}
 function vBtn(u,t){if(!u)return'<span class="nv">—</span>';return`<a href="${u}" target="_blank" class="vl"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>${t||'Ver'}</a>`;}
 function cTag(c){const l={liga:'Liga',copa:'Copa',amistoso:'Amistoso'};return`<span class="ctg ${c}">${l[c]||c}</span>`;}
-function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className=`show ${type}`;setTimeout(()=>t.className='',3000);}
 function setSy(s){const el=document.getElementById('si'),tx=document.getElementById('st');el.className=s;tx.textContent=s==='live'?'EN VIVO':s==='off'?'SIN SEÑAL':'...';}
 function chkLd(){if(++lded>=2)setTimeout(()=>document.getElementById('ls').classList.add('hide'),600);}
 
-// FORM TAG
-// RENDER
 function rO(){
   const w=matches.filter(m=>+m.ga>+m.gr).length,dr=matches.filter(m=>+m.ga===+m.gr).length,l=matches.filter(m=>+m.ga<+m.gr).length;
   const gf=matches.reduce((s,m)=>s+(+m.ga),0),gc=matches.reduce((s,m)=>s+(+m.gr),0);
@@ -611,7 +404,7 @@ function rO(){
 }
 
 function rM(){
-  const s=[...matches].sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
+  const s=sortByJornada(matches);
   document.getElementById('ac').textContent=`${s.length} partidos`;
   document.getElementById('atb2').innerHTML=s.length===0
     ?`<tr><td colspan="9" class="es">Sin partidos aún</td></tr>`
@@ -629,15 +422,8 @@ function rM(){
   document.getElementById('mcs').innerHTML=s.length===0
     ?`<div class="es">Sin partidos aún</div>`
     :s.map(m=>{const r=gR(m.ga,m.gr);return`<div class="mc ${r}">
-      <div class="mch">
-        <div><div style="font-weight:700;font-size:14px">${m.rival}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${fD(m.fecha)}</div></div>
-        <div class="mcs2">${m.ga} — ${m.gr}</div>
-      </div>
-      <div class="mcm">
-        <span class="rp ${r}">${r}</span>${cTag(m.comp)}
-        ${m.jornada?`<span style="font-size:10px;color:var(--muted2)">${m.jornada}</span>`:''}
-        ${m.video?`<a href="${m.video}" target="_blank" class="vl"><svg viewBox="0 0 24 24" fill="currentColor" width="10" height="10"><path d="M8 5v14l11-7z"/></svg>Ver</a>`:''}
-      </div>
+      <div class="mch"><div><div style="font-weight:700;font-size:14px">${m.rival}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${fD(m.fecha)}</div></div><div class="mcs2">${m.ga} — ${m.gr}</div></div>
+      <div class="mcm"><span class="rp ${r}">${r}</span>${cTag(m.comp)}${m.jornada?`<span style="font-size:10px;color:var(--muted2)">${m.jornada}</span>`:''}${m.video?`<a href="${m.video}" target="_blank" class="vl"><svg viewBox="0 0 24 24" fill="currentColor" width="10" height="10"><path d="M8 5v14l11-7z"/></svg>Ver</a>`:''}</div>
       ${m.notas?`<div class="mcn">${m.notas}</div>`:''}
     </div>`;}).join('');
 }
@@ -650,230 +436,15 @@ function rV(f){
     ?`<div class="es" style="grid-column:1/-1">Sin videos en esta categoría</div>`
     :s.map(v=>`<a href="${v.link}" target="_blank" class="vc">
       <div class="vth"><div class="vct">${v.cat||'Video'}</div><div class="pi"><svg viewBox="0 0 24 24" fill="var(--gold)"><path d="M8 5v14l11-7z"/></svg></div></div>
-      <div class="vi">
-        <div class="vtt">${v.titulo}</div>
-        ${v.desc?`<div class="vd">${v.desc}</div>`:''}
-        <div class="vm">${fD(v.fecha)}</div>
-      </div>
+      <div class="vi"><div class="vtt">${v.titulo}</div>${v.desc?`<div class="vd">${v.desc}</div>`:''}<div class="vm">${fD(v.fecha)}</div></div>
     </a>`).join('');
 }
 
-function rMM(){
-  const s=[...matches].sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
-  document.getElementById('mtb').innerHTML=s.length===0
-    ?`<tr><td colspan="6" class="es">Sin partidos</td></tr>`
-    :s.map(m=>{const r=gR(m.ga,m.gr);return`<tr class="mmr">
-      <td style="color:var(--muted);font-size:11px;white-space:nowrap">${fD(m.fecha)}</td>
-      <td><strong>${m.rival}</strong></td>
-      <td><span class="rp ${r}" style="margin-right:4px">${r}</span>${m.ga}–${m.gr}</td>
-      <td>${cTag(m.comp)}</td>
-      <td>${m.video?`<a href="${m.video}" target="_blank" style="color:var(--gold);font-size:11px">▶</a>`:'—'}</td>
-      <td><div class="ab">
-        <button class="be" onclick="oEd('${m.id}')">✏️</button>
-        <button class="bd" onclick="oDel('${m.id}','partido','${m.rival.replace(/'/g,'')}')">🗑️</button>
-      </div></td>
-    </tr>`;}).join('');
-}
+onSnapshot(collection(db,'partidos'),snap=>{matches=snap.docs.map(d=>({id:d.id,...d.data()}));rO();rM();setSy('live');chkLd();},()=>{setSy('off');chkLd();});
+onSnapshot(collection(db,'videos'),snap=>{videos=snap.docs.map(d=>({id:d.id,...d.data()}));rV(vFilter);chkLd();},()=>{chkLd();});
 
-function rMV(){
-  const s=[...videos].sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
-  document.getElementById('mvtb').innerHTML=s.length===0
-    ?`<tr><td colspan="4" class="es">Sin videos</td></tr>`
-    :s.map(v=>`<tr class="mmr">
-      <td style="color:var(--muted);font-size:11px;white-space:nowrap">${fD(v.fecha)}</td>
-      <td style="max-width:200px"><strong style="font-size:12px">${v.titulo}</strong></td>
-      <td><span style="font-size:9px;color:var(--gold)">${v.cat||'—'}</span></td>
-      <td><div class="ab">
-        <button class="be" onclick="oVEd('${v.id}')">✏️</button>
-        <button class="bd" onclick="oDel('${v.id}','video','${v.titulo.replace(/'/g,'')}')">🗑️</button>
-      </div></td>
-    </tr>`).join('');
-}
-
-function rAll(){rO();rM();rV(vFilter);if(isAdmin){rMM();rMV();}}
-
-// FIRESTORE
-initPin();
-onSnapshot(collection(db,'partidos'),snap=>{matches=snap.docs.map(d=>({id:d.id,...d.data()}));rO();rM();if(isAdmin){rMM();rJM();}setSy('live');chkLd();},()=>{setSy('off');chkLd();});
-onSnapshot(collection(db,'videos'),snap=>{videos=snap.docs.map(d=>({id:d.id,...d.data()}));rV(vFilter);if(isAdmin)rMV();chkLd();},()=>{chkLd();});
-
-// ACTIONS
-window.aM=async function(){
-  const rival=document.getElementById('fr2').value.trim(),fecha=document.getElementById('ff').value;
-  if(!rival||!fecha){toast('Completa rival y fecha','err');return;}
-  const btn=document.getElementById('bam');btn.disabled=true;btn.textContent='Guardando...';
-  try{
-    await addDoc(collection(db,'partidos'),{rival,fecha,ga:parseInt(document.getElementById('fg2').value)||0,gr:parseInt(document.getElementById('fgr').value)||0,comp:document.getElementById('fc2').value,jornada:document.getElementById('fj').value,video:document.getElementById('fv').value,vtipo:document.getElementById('fvt').value,notas:document.getElementById('fn').value,createdAt:new Date().toISOString()});
-    ['fr2','fg2','fgr','fj','fv','fn'].forEach(id=>document.getElementById(id).value='');
-    toast('✅ Partido guardado');
-  }catch(e){toast('Error guardando','err');}
-  btn.disabled=false;btn.textContent='+ Registrar Partido';
-};
-
-window.oEd=function(id){
-  const m=matches.find(x=>x.id===id);if(!m)return;
-  document.getElementById('ei').value=id;
-  document.getElementById('er').value=m.rival||'';
-  document.getElementById('ef').value=m.fecha||'';
-  document.getElementById('eg').value=m.ga??0;
-  document.getElementById('egr').value=m.gr??0;
-  document.getElementById('ec').value=m.comp||'liga';
-  document.getElementById('ej').value=m.jornada||'';
-  document.getElementById('ev').value=m.video||'';
-  document.getElementById('et').value=m.vtipo||'Análisis';
-  document.getElementById('en').value=m.notas||'';
-  document.getElementById('em').classList.remove('hide');
-};
-window.sEd=async function(){
-  const id=document.getElementById('ei').value,rival=document.getElementById('er').value.trim(),fecha=document.getElementById('ef').value;
-  if(!rival||!fecha){toast('Completa rival y fecha','err');return;}
-  try{
-    await updateDoc(doc(db,'partidos',id),{rival,fecha,ga:parseInt(document.getElementById('eg').value)||0,gr:parseInt(document.getElementById('egr').value)||0,comp:document.getElementById('ec').value,jornada:document.getElementById('ej').value,video:document.getElementById('ev').value,vtipo:document.getElementById('et').value,notas:document.getElementById('en').value,updatedAt:new Date().toISOString()});
-    cEm();toast('✅ Partido actualizado');
-  }catch(e){toast('Error','err');}
-};
-window.cEm=function(){document.getElementById('em').classList.add('hide');};
-
-window.aV=async function(){
-  const titulo=document.getElementById('vt2').value.trim(),link=document.getElementById('vl2').value.trim();
-  if(!titulo||!link){toast('Completa título y link','err');return;}
-  const btn=document.getElementById('bav');btn.disabled=true;btn.textContent='Subiendo...';
-  try{
-    await addDoc(collection(db,'videos'),{titulo,link,cat:document.getElementById('vc3').value,fecha:document.getElementById('vf2').value,desc:document.getElementById('vd2').value,createdAt:new Date().toISOString()});
-    ['vt2','vl2','vf2','vd2'].forEach(id=>document.getElementById(id).value='');
-    toast('✅ Video guardado');
-    sTab('v',document.querySelector('.tb:nth-child(3)'));
-  }catch(e){toast('Error','err');}
-  btn.disabled=false;btn.textContent='▶ Subir Video';
-};
-window.oVEd=function(id){
-  const v=videos.find(x=>x.id===id);if(!v)return;
-  document.getElementById('evi').value=id;
-  document.getElementById('evt').value=v.titulo||'';
-  document.getElementById('evl').value=v.link||'';
-  document.getElementById('evc').value=v.cat||'Análisis Táctico';
-  document.getElementById('evf').value=v.fecha||'';
-  document.getElementById('evd').value=v.desc||'';
-  document.getElementById('evm').classList.remove('hide');
-};
-window.sVEd=async function(){
-  const id=document.getElementById('evi').value,titulo=document.getElementById('evt').value.trim(),link=document.getElementById('evl').value.trim();
-  if(!titulo||!link){toast('Completa título y link','err');return;}
-  try{
-    await updateDoc(doc(db,'videos',id),{titulo,link,cat:document.getElementById('evc').value,fecha:document.getElementById('evf').value,desc:document.getElementById('evd').value,updatedAt:new Date().toISOString()});
-    cEvm();toast('✅ Video actualizado');
-  }catch(e){toast('Error','err');}
-};
-window.cEvm=function(){document.getElementById('evm').classList.add('hide');};
-
-window.oDel=function(id,type,nombre){
-  document.getElementById('cfi').value=id;
-  document.getElementById('cftp').value=type;
-  document.getElementById('cft').textContent=`¿Borrar ${type==='partido'?'el partido vs '+nombre:'"'+nombre+'"'}? No se puede deshacer.`;
-  document.getElementById('cfm').classList.remove('hide');
-};
-window.cDel=async function(){
-  const id=document.getElementById('cfi').value,type=document.getElementById('cftp').value;
-  try{await deleteDoc(doc(db,type==='partido'?'partidos':'videos',id));cCfm();toast('🗑️ Eliminado');}
-  catch(e){toast('Error','err');}
-};
-window.cCfm=function(){document.getElementById('cfm').classList.add('hide');};
-// ── JORNADA MANAGER ──────────────────────────────────────
-let jmOrder = [];
-let jmDirty = {}; // track unsaved changes
-
-function rJM() {
-  // Sync order with new matches without resetting custom order
-  const existing = new Set(jmOrder);
-  const newIds = matches.map(m=>m.id);
-  // Add new matches at end
-  newIds.forEach(id=>{ if(!existing.has(id)) jmOrder.push(id); });
-  // Remove deleted matches
-  jmOrder = jmOrder.filter(id=>newIds.includes(id));
-  // Default sort if empty
-  if(jmOrder.length===0){
-    jmOrder=[...matches].sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||'')).map(m=>m.id);
-  }
-  const container=document.getElementById('jm-list');
-  if(!container)return;
-  if(jmOrder.length===0){container.innerHTML='<div class="es">Sin partidos registrados</div>';return;}
-  container.innerHTML=jmOrder.map((id,idx)=>{
-    const m=matches.find(x=>x.id===id);if(!m)return'';
-    const r=gR(m.ga,m.gr);
-    const isDirty=jmDirty[id];
-    return `<div class="jm-row" id="jmr-${id}" style="${isDirty?'border-color:rgba(232,160,32,0.5)':''}">
-      <div class="jm-arrows">
-        <button class="jm-arrow" onclick="jmMove('${id}',-1)" ${idx===0?'disabled':''}>▲</button>
-        <button class="jm-arrow" onclick="jmMove('${id}',1)" ${idx===jmOrder.length-1?'disabled':''}>▼</button>
-      </div>
-      <span class="rp ${r}" style="flex-shrink:0">${r}</span>
-      <div class="jm-info">
-        <div class="jm-rival">${m.rival}</div>
-        <div class="jm-date">${fD(m.fecha)} · ${m.ga}–${m.gr}</div>
-      </div>
-      <input class="jm-input" id="jmi-${id}" type="text" value="${jmDirty[id]!==undefined?jmDirty[id]:m.jornada||''}" placeholder="J1, Cuartos..." oninput="jmDirty['${id}']=this.value;this.closest('.jm-row').style.borderColor='rgba(232,160,32,0.5)'">
-      <button class="jm-save" onclick="saveOneJornada('${id}')">Guardar</button>
-    </div>`;
-  }).join('');
-}
-
-window.jmMove=async function(id,dir){
-  const idx=jmOrder.indexOf(id);if(idx<0)return;
-  const newIdx=idx+dir;
-  if(newIdx<0||newIdx>=jmOrder.length)return;
-  // Save current input values before re-render
-  jmOrder.forEach(mid=>{
-    const inp=document.getElementById('jmi-'+mid);
-    if(inp)jmDirty[mid]=inp.value;
-  });
-  [jmOrder[idx],jmOrder[newIdx]]=[jmOrder[newIdx],jmOrder[idx]];
-  rJM();
-};
-
-window.saveOneJornada=async function(id){
-  const val=document.getElementById('jmi-'+id)?.value.trim()||'';
-  try{
-    await updateDoc(doc(db,'partidos',id),{jornada:val,updatedAt:new Date().toISOString()});
-    delete jmDirty[id];
-    document.getElementById('jmr-'+id)?.style.removeProperty('border-color');
-    toast('✅ Jornada actualizada');
-  }catch(e){toast('Error guardando','err');}
-};
-
-window.saveAllJornadas=async function(){
-  // Capture all current values first
-  jmOrder.forEach(id=>{
-    const inp=document.getElementById('jmi-'+id);
-    if(inp)jmDirty[id]=inp.value;
-  });
-  const btn=document.querySelector('#jm-section .bs');
-  btn.disabled=true;btn.textContent='Guardando...';
-  try{
-    const promises=jmOrder.map(id=>{
-      const val=(jmDirty[id]!==undefined?jmDirty[id]:(matches.find(x=>x.id===id)?.jornada||''));
-      return updateDoc(doc(db,'partidos',id),{jornada:val,updatedAt:new Date().toISOString()});
-    });
-    await Promise.all(promises);
-    jmDirty={};
-    toast('✅ Todas las jornadas guardadas');
-  }catch(e){toast('Error guardando','err');}
-  btn.disabled=false;btn.textContent='💾 Guardar Todos los Cambios';
-};
-
-
-window.fV=function(cat,btn){
-  vFilter=cat;
-  document.querySelectorAll('.ct2').forEach(b=>b.classList.remove('on'));
-  if(btn)btn.classList.add('on');
-  rV(cat);
-};
-
-window.sTab=function(name,btn){
-  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
-  document.getElementById('tp-'+name).classList.add('on');
-  if(btn)btn.classList.add('on');
-};
+window.fV=function(cat,btn){vFilter=cat;document.querySelectorAll('.ct2').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');rV(cat);};
+window.sTab=function(name,btn){document.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));document.getElementById('tp-'+name).classList.add('on');if(btn)btn.classList.add('on');};
 </script>
 </body>
 </html>
