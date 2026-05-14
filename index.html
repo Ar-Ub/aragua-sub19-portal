@@ -694,7 +694,7 @@ function rAll(){rO();rM();rV(vFilter);if(isAdmin){rMM();rMV();}}
 
 // FIRESTORE
 initPin();
-onSnapshot(collection(db,'partidos'),snap=>{matches=snap.docs.map(d=>({id:d.id,...d.data()}));rO();rM();if(isAdmin)rMM();setSy('live');chkLd();},()=>{setSy('off');chkLd();});
+onSnapshot(collection(db,'partidos'),snap=>{matches=snap.docs.map(d=>({id:d.id,...d.data()}));rO();rM();if(isAdmin){rMM();rJM();}setSy('live');chkLd();},()=>{setSy('off');chkLd();});
 onSnapshot(collection(db,'videos'),snap=>{videos=snap.docs.map(d=>({id:d.id,...d.data()}));rV(vFilter);if(isAdmin)rMV();chkLd();},()=>{chkLd();});
 
 // ACTIONS
@@ -779,21 +779,29 @@ window.cDel=async function(){
 };
 window.cCfm=function(){document.getElementById('cfm').classList.add('hide');};
 // ── JORNADA MANAGER ──────────────────────────────────────
-let jmOrder = []; // array of match ids in display order
+let jmOrder = [];
+let jmDirty = {}; // track unsaved changes
 
 function rJM() {
-  // Sort by fecha by default, then allow reordering
-  if(jmOrder.length === 0) {
-    jmOrder = [...matches].sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||'')).map(m=>m.id);
+  // Sync order with new matches without resetting custom order
+  const existing = new Set(jmOrder);
+  const newIds = matches.map(m=>m.id);
+  // Add new matches at end
+  newIds.forEach(id=>{ if(!existing.has(id)) jmOrder.push(id); });
+  // Remove deleted matches
+  jmOrder = jmOrder.filter(id=>newIds.includes(id));
+  // Default sort if empty
+  if(jmOrder.length===0){
+    jmOrder=[...matches].sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||'')).map(m=>m.id);
   }
-  const container = document.getElementById('jm-list');
-  if(!container) return;
-  if(jmOrder.length === 0){container.innerHTML='<div class="es">Sin partidos registrados</div>';return;}
-  container.innerHTML = jmOrder.map((id,idx) => {
-    const m = matches.find(x=>x.id===id);
-    if(!m) return '';
-    const r = gR(m.ga,m.gr);
-    return `<div class="jm-row" id="jmr-${id}">
+  const container=document.getElementById('jm-list');
+  if(!container)return;
+  if(jmOrder.length===0){container.innerHTML='<div class="es">Sin partidos registrados</div>';return;}
+  container.innerHTML=jmOrder.map((id,idx)=>{
+    const m=matches.find(x=>x.id===id);if(!m)return'';
+    const r=gR(m.ga,m.gr);
+    const isDirty=jmDirty[id];
+    return `<div class="jm-row" id="jmr-${id}" style="${isDirty?'border-color:rgba(232,160,32,0.5)':''}">
       <div class="jm-arrows">
         <button class="jm-arrow" onclick="jmMove('${id}',-1)" ${idx===0?'disabled':''}>▲</button>
         <button class="jm-arrow" onclick="jmMove('${id}',1)" ${idx===jmOrder.length-1?'disabled':''}>▼</button>
@@ -803,42 +811,53 @@ function rJM() {
         <div class="jm-rival">${m.rival}</div>
         <div class="jm-date">${fD(m.fecha)} · ${m.ga}–${m.gr}</div>
       </div>
-      <input class="jm-input" id="jmi-${id}" type="text" value="${m.jornada||''}" placeholder="J1, Cuartos...">
+      <input class="jm-input" id="jmi-${id}" type="text" value="${jmDirty[id]!==undefined?jmDirty[id]:m.jornada||''}" placeholder="J1, Cuartos..." oninput="jmDirty['${id}']=this.value;this.closest('.jm-row').style.borderColor='rgba(232,160,32,0.5)'">
       <button class="jm-save" onclick="saveOneJornada('${id}')">Guardar</button>
     </div>`;
   }).join('');
 }
 
-window.jmMove = function(id, dir) {
-  const idx = jmOrder.indexOf(id);
-  if(idx < 0) return;
-  const newIdx = idx + dir;
-  if(newIdx < 0 || newIdx >= jmOrder.length) return;
-  // Swap
-  [jmOrder[idx], jmOrder[newIdx]] = [jmOrder[newIdx], jmOrder[idx]];
+window.jmMove=async function(id,dir){
+  const idx=jmOrder.indexOf(id);if(idx<0)return;
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=jmOrder.length)return;
+  // Save current input values before re-render
+  jmOrder.forEach(mid=>{
+    const inp=document.getElementById('jmi-'+mid);
+    if(inp)jmDirty[mid]=inp.value;
+  });
+  [jmOrder[idx],jmOrder[newIdx]]=[jmOrder[newIdx],jmOrder[idx]];
   rJM();
 };
 
-window.saveOneJornada = async function(id) {
-  const val = document.getElementById('jmi-'+id)?.value.trim();
-  try {
+window.saveOneJornada=async function(id){
+  const val=document.getElementById('jmi-'+id)?.value.trim()||'';
+  try{
     await updateDoc(doc(db,'partidos',id),{jornada:val,updatedAt:new Date().toISOString()});
+    delete jmDirty[id];
+    document.getElementById('jmr-'+id)?.style.removeProperty('border-color');
     toast('✅ Jornada actualizada');
-  } catch(e) { toast('Error guardando','err'); }
+  }catch(e){toast('Error guardando','err');}
 };
 
-window.saveAllJornadas = async function() {
-  const btn = document.querySelector('#jm-section .bs');
-  btn.disabled=true; btn.textContent='Guardando...';
-  try {
-    const promises = jmOrder.map(id => {
-      const val = document.getElementById('jmi-'+id)?.value.trim()||'';
+window.saveAllJornadas=async function(){
+  // Capture all current values first
+  jmOrder.forEach(id=>{
+    const inp=document.getElementById('jmi-'+id);
+    if(inp)jmDirty[id]=inp.value;
+  });
+  const btn=document.querySelector('#jm-section .bs');
+  btn.disabled=true;btn.textContent='Guardando...';
+  try{
+    const promises=jmOrder.map(id=>{
+      const val=(jmDirty[id]!==undefined?jmDirty[id]:(matches.find(x=>x.id===id)?.jornada||''));
       return updateDoc(doc(db,'partidos',id),{jornada:val,updatedAt:new Date().toISOString()});
     });
     await Promise.all(promises);
+    jmDirty={};
     toast('✅ Todas las jornadas guardadas');
-  } catch(e) { toast('Error guardando','err'); }
-  btn.disabled=false; btn.textContent='💾 Guardar Todos los Cambios';
+  }catch(e){toast('Error guardando','err');}
+  btn.disabled=false;btn.textContent='💾 Guardar Todos los Cambios';
 };
 
 
